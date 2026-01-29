@@ -130,7 +130,7 @@ export default function VendorBenefits() {
           >
             Why Choose Us
           </motion.span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-foreground mb-4">
             Everything You Need to{" "}
             <span className="gradient-text">Succeed</span>
           </h2>
@@ -188,7 +188,7 @@ export default function VendorBenefits() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-xl font-bold font-heading text-foreground mb-2 group-hover:text-primary transition-colors">
                       {benefit.title}
                     </h3>
 
