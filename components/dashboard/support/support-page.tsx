@@ -156,8 +156,12 @@ export function SupportPage() {
               <Headphones className="h-5 w-5 text-[#3E8940]" />
             </div>
             <div>
-              <h2 className="font-semibold text-slate-900">Submit a Request</h2>
-              <p className="text-xs text-slate-500">Response within 24 hours</p>
+              <h2 className="font-semibold text-slate-900">
+                Submit a Support Request.
+              </h2>
+              <p className="text-xs text-slate-500">
+                Most issues are resolved within 24 hours.
+              </p>
             </div>
           </div>
           <div className="p-5 space-y-4">
@@ -236,7 +240,7 @@ export function SupportPage() {
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
             <Button variant="outline" className="w-full gap-2 h-10">
               <FileText className="h-4 w-4" />
-              View All FAQs
+              Visit Help Center
             </Button>
           </div>
         </div>

@@ -67,7 +67,7 @@ export function LoginForm() {
               htmlFor="password"
               className="text-xs font-bold uppercase tracking-wider text-gray-500 ml-1"
             >
-              Password / OTP
+              Password (or enter OTP if using OTP login)
             </Label>
             <a
               href="#"
@@ -105,26 +105,26 @@ export function LoginForm() {
         <div className="space-y-4 pt-4">
           <Button
             type="button"
+            variant="outline"
+            onClick={handleLogin}
+            className="w-full h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 bg-white hover:border-gray-300 rounded-xl transition-all"
+          >
+            Get OTP Instead
+          </Button>
+
+          <Button
+            type="button"
             onClick={handleLogin}
             className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-emerald-600 hover:from-primary/90 hover:to-emerald-700 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300 rounded-xl"
           >
             Secure Login
           </Button>
-          <div className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs uppercase text-muted-foreground">
-              Or continue with
-            </span>
-            <div className="h-px flex-1 bg-gray-200" />
+
+          <div className="pt-2">
+            <p className="text-xs text-gray-400 text-center">
+              🔒 Your data is encrypted and securely stored.
+            </p>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleLogin}
-            className="w-full h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 bg-white hover:border-gray-300 rounded-xl transition-all"
-          >
-            Request OTP Access
-          </Button>
         </div>
       </div>
 

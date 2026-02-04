@@ -322,7 +322,7 @@ export default function OrdersPage() {
             Orders Dashboard
           </h1>
           <p className="text-slate-500">
-            Manage your incoming laundry orders and track earnings in real-time.
+            Review, accept and manage laundry orders while tracking your earnings in real time.
           </p>
         </div>
         <button

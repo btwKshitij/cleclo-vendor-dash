@@ -1,67 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Package,
-  ToggleLeft,
-  ToggleRight,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  Info,
-} from "lucide-react";
+import { Package, AlertCircle, CheckCircle, Clock, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 // Services assigned by admin - vendors can ONLY toggle availability
 const assignedServices = [
   {
     id: 1,
-    name: "Wash & Fold",
-    description: "Regular laundry with folding",
+    name: "Dry Clean",
+    description: "Premium dry cleaning service",
+    basePrice: "₹150/piece",
+    category: "Dry Clean",
+    available: true,
+  },
+  {
+    id: 2,
+    name: "Washing",
+    description: "Regular laundry service",
     basePrice: "₹80/kg",
     category: "Wash",
     available: true,
   },
   {
-    id: 2,
-    name: "Wash & Iron",
-    description: "Laundry with ironing service",
-    basePrice: "₹120/kg",
-    category: "Wash",
-    available: true,
-  },
-  {
     id: 3,
-    name: "Dry Clean - Suit",
-    description: "Premium dry cleaning for suits",
-    basePrice: "₹350/piece",
-    category: "Dry Clean",
-    available: true,
-  },
-  {
-    id: 4,
-    name: "Dry Clean - Saree",
-    description: "Specialized saree dry cleaning",
-    basePrice: "₹250/piece",
-    category: "Dry Clean",
-    available: false,
-  },
-  {
-    id: 5,
-    name: "Iron Only",
-    description: "Pressing and ironing service",
-    basePrice: "₹15/piece",
+    name: "Steam Iron",
+    description: "Professional steam ironing",
+    basePrice: "₹20/piece",
     category: "Iron",
     available: true,
   },
   {
-    id: 6,
-    name: "Stain Removal",
-    description: "Special stain treatment",
+    id: 4,
+    name: "Darning/Repair",
+    description: "Expert fabric repair and darning",
     basePrice: "₹100/item",
-    category: "Special",
+    category: "Repair",
     available: true,
   },
 ];
@@ -74,6 +60,8 @@ const getCategoryColor = (category: string) => {
       return "bg-purple-100 text-purple-700";
     case "Iron":
       return "bg-amber-100 text-amber-700";
+    case "Repair":
+      return "bg-orange-100 text-orange-700";
     case "Special":
       return "bg-pink-100 text-pink-700";
     default:
@@ -83,25 +71,98 @@ const getCategoryColor = (category: string) => {
 
 export default function ServicesPage() {
   const [services, setServices] = useState(assignedServices);
+  const [disableDialogOpen, setDisableDialogOpen] = useState(false);
+  const [serviceToDisable, setServiceToDisable] = useState<number | null>(null);
+  const [disableReason, setDisableReason] = useState("");
 
   const toggleAvailability = (id: number) => {
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, available: !s.available } : s)),
-    );
+    const service = services.find((s) => s.id === id);
+    if (!service) return;
+
+    if (service.available) {
+      // If currently Available, user is trying to Disable -> Open Modal
+      setServiceToDisable(id);
+      setDisableDialogOpen(true);
+    } else {
+      // If currently Unavailable, user is trying to Enable -> Do instantly
+      setServices((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, available: true } : s)),
+      );
+    }
+  };
+
+  const handleConfirmDisable = () => {
+    if (serviceToDisable !== null) {
+      setServices((prev) =>
+        prev.map((s) =>
+          s.id === serviceToDisable ? { ...s, available: false } : s,
+        ),
+      );
+    }
+    setDisableDialogOpen(false);
+    setServiceToDisable(null);
+    setDisableReason("");
   };
 
   const availableCount = services.filter((s) => s.available).length;
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Disable Reason Dialog */}
+      <Dialog open={disableDialogOpen} onOpenChange={setDisableDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] bg-white text-slate-900 border-none shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900">
+              Disable Service?
+            </DialogTitle>
+            <DialogDescription className="text-slate-500">
+              Please provide a reason why this service is temporarily
+              unavailable.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="reason" className="font-semibold text-slate-700">
+                Reason
+              </Label>
+              <Textarea
+                id="reason"
+                placeholder="e.g. Machine breakdown, Out of supplies..."
+                className="bg-white border-slate-200 focus:border-primary/50 text-slate-900 min-h-[100px]"
+                value={disableReason}
+                onChange={(e) => setDisableReason(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDisableDialogOpen(false)}
+              className="border-slate-200 text-slate-700 hover:bg-slate-50 font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDisable}
+              disabled={!disableReason.trim()}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold"
+            >
+              Disable Service
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl text-black font-bold tracking-tight">
             Service Catalog
           </h1>
-          <p className="text-slate-500 mt-1">
-            Services assigned to your outlet by Admin
+          <p className="text-slate-500 mt-1 text-lg">
+            Services and pricing are managed by Admin. You can temporarily
+            toggle availability (e.g., equipment issues). Contact Admin for
+            changes.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -123,9 +184,7 @@ export default function ServicesPage() {
           <p className="font-medium text-blue-800">Read-Only Service Catalog</p>
           <p className="text-sm text-blue-700 mt-1">
             Services are assigned and priced by Admin. You can only toggle
-            availability (e.g., mark as &quot;Temporarily Unavailable&quot; if
-            equipment is broken). Contact Admin to add new services or change
-            prices.
+            availability. Contact Admin to add new services or change prices.
           </p>
         </div>
       </div>
