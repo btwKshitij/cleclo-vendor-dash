@@ -104,7 +104,7 @@ export default function VendorBenefits() {
   const getGridClass = (size: string, index: number) => {
     switch (size) {
       case "large":
-        return index === 0 ? "md:col-span-2 md:row-span-2" : "md:col-span-3";
+        return index === 0 ? "md:col-span-2 md:row-span-2" : "md:col-span-4";
       case "medium":
         return "md:col-span-1 md:row-span-2";
       default:
@@ -128,7 +128,6 @@ export default function VendorBenefits() {
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         {/* Section header */}
-        {/* Section header */}
         <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -145,7 +144,7 @@ export default function VendorBenefits() {
           >
             Why Choose Us
           </motion.span>
-          <h2 className="text-4xl md:text-5xl lg:text-5xl font-bold font-heading text-foreground mb-4 break-words">
+          <h2 className="text-4xl md:text-5xl lg:text-4xl font-bold font-heading text-foreground mb-4">
             Purpose Built Tools to Manage Operations, Increase Efficiency and{" "}
             <span className="gradient-text">
               Scale Your Laundry Business with Confidence.
@@ -158,11 +157,9 @@ export default function VendorBenefits() {
         </motion.div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[minmax(280px,auto)]">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[200px]">
           {benefits.map((benefit, index) => {
             const IconComponent = benefit.icon;
-            const isWide = benefit.size === "large" && index !== 0;
-
             return (
               <motion.div
                 key={index}
@@ -179,7 +176,7 @@ export default function VendorBenefits() {
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                <div className="h-full bg-card rounded-2xl p-6 md:p-8 border border-border hover:border-primary/30 transition-all duration-500 relative group-hover:shadow-xl group-hover:shadow-primary/5 flex flex-col">
+                <div className="h-full bg-card rounded-2xl p-6 md:p-8 border border-border hover:border-primary/30 transition-all duration-500 relative group-hover:shadow-xl group-hover:shadow-primary/5">
                   {/* Gradient overlay on hover */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}
@@ -187,7 +184,7 @@ export default function VendorBenefits() {
 
                   {/* Animated border gradient */}
                   <div
-                    className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
+                    className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                   >
                     <div
                       className={`absolute inset-[1px] rounded-2xl bg-card`}
@@ -198,28 +195,23 @@ export default function VendorBenefits() {
                   </div>
 
                   {/* Content */}
-                  <div
-                    className={`relative z-10 h-full flex ${isWide ? "flex-col md:flex-row md:items-center md:gap-8" : "flex-col"}`}
-                  >
+                  <div className="relative z-10 h-full flex flex-col">
                     {/* Icon */}
                     <div
-                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} ${isWide ? "mb-6 md:mb-0" : "mb-6"} shadow-lg group-hover:scale-110 transition-transform duration-300 shrink-0`}
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}
                     >
-                      <IconComponent className="w-6 h-6 text-white" />
+                      <IconComponent className="w-6 h-10 text-white" />
                     </div>
 
-                    {/* Text Content */}
-                    <div className="flex-1 flex flex-col">
-                      {/* Title */}
-                      <h3 className="text-xl font-bold font-heading text-foreground mb-3 group-hover:text-primary transition-colors break-words">
-                        {benefit.title}
-                      </h3>
+                    {/* Title */}
+                    <h3 className="text-xl font-bold font-heading text-foreground mb-2 group-hover:text-primary transition-colors">
+                      {benefit.title}
+                    </h3>
 
-                      {/* Description */}
-                      <p className="text-lg leading-relaxed text-muted-foreground break-words flex-grow">
-                        {benefit.description}
-                      </p>
-                    </div>
+                    {/* Description */}
+                    <p className="text-lg leading-relaxed flex-1">
+                      {benefit.description}
+                    </p>
 
                     {/* Decorative element */}
                     <motion.div
@@ -229,7 +221,7 @@ export default function VendorBenefits() {
 
                   {/* Corner accent */}
                   <div
-                    className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${benefit.gradient} opacity-[0.08] rounded-full group-hover:scale-150 transition-transform duration-700 pointer-events-none`}
+                    className={`absolute -top-12 -right-12 w-32 h-32 bg-gradient-to-br ${benefit.gradient} opacity-[0.08] rounded-full group-hover:scale-150 transition-transform duration-700`}
                   />
                 </div>
               </motion.div>

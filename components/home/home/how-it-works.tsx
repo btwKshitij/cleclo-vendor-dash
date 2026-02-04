@@ -2,14 +2,7 @@
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import {
-  UserPlus,
-  Store,
-  Package,
-  Banknote,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { UserPlus, Store, Package, Banknote, ArrowRight } from "lucide-react";
 
 export default function HowItWorks() {
   const steps = [
@@ -60,17 +53,6 @@ export default function HowItWorks() {
   });
 
   const lineHeight = useTransform(scrollYProgress, [0.1, 0.9], ["0%", "100%"]);
-  // Show between Step 2 (~0.36) and Step 3 (~0.63)
-  const badgeOpacity = useTransform(
-    scrollYProgress,
-    [0.35, 0.45, 0.55, 0.65],
-    [0, 1, 1, 0],
-  );
-  const badgeScale = useTransform(
-    scrollYProgress,
-    [0.35, 0.45, 0.55, 0.65],
-    [0.8, 1, 1, 0.8],
-  );
 
   return (
     <section
@@ -120,24 +102,6 @@ export default function HowItWorks() {
               className="absolute top-0 left-0 w-full bg-gradient-to-b from-primary via-secondary to-primary"
               style={{ height: lineHeight }}
             />
-          </div>
-
-          {/* Dynamic Badge - Between Step 2 and 3 */}
-          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-            <motion.div
-              style={{ opacity: badgeOpacity, scale: badgeScale }}
-              className="bg-background/80 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 px-6 py-3 rounded-2xl flex items-center gap-4 whitespace-nowrap"
-            >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div className="text-sm">
-                <p className="font-bold text-foreground">Cleclo Intelligence</p>
-                <p className="text-muted-foreground">
-                  Handles order routing & notifications automatically
-                </p>
-              </div>
-            </motion.div>
           </div>
 
           {/* Steps */}
