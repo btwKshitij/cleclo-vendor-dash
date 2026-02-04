@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   Bell,
   Zap,
@@ -105,323 +106,382 @@ export function NewOrderModal({ open, onOpenChange }: NewOrderModalProps) {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [showReportProblem, setShowReportProblem] = useState(false);
+  const [isAccepted, setIsAccepted] = useState(false);
 
-  const toggleImageSelection = (imgUrl: string) => {
-    setSelectedImages((prev) =>
-      prev.includes(imgUrl)
-        ? prev.filter((url) => url !== imgUrl)
-        : [...prev, imgUrl],
-    );
+  const handleToggleDetails = () => {
+    setShowDetails(!showDetails);
+  };
+
+  const toggleImageSelection = (img: string) => {
+    if (selectedImages.includes(img)) {
+      setSelectedImages(selectedImages.filter((i) => i !== img));
+    } else {
+      setSelectedImages([...selectedImages, img]);
+    }
+  };
+
+  const handleAcceptOrder = () => {
+    setIsAccepted(true);
+    // Wait for animation/user to see the success message
+    setTimeout(() => {
+      onOpenChange(false);
+      router.push("/dashboard/schedule");
+      // Reset state functionality if modal is reused, though typically it unmounts
+      setTimeout(() => setIsAccepted(false), 300);
+    }, 5000);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-[#F8F9FB] border-none shadow-2xl gap-0">
-        {/* Custom Header */}
-        <div className="bg-white p-5 pb-4 border-b border-dashed border-slate-100 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-[#3E8940]/10 flex items-center justify-center text-[#3E8940]">
-              <Bell className="h-6 w-6" />
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-slate-50 border-0">
+        {isAccepted ? (
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-4 bg-white h-full min-h-[400px]">
+            <div className="h-20 w-20 bg-emerald-100 rounded-full flex items-center justify-center mb-2 animate-in zoom-in duration-300">
+              <Check className="h-10 w-10 text-emerald-600" strokeWidth={3} />
             </div>
-            <div>
-              <DialogTitle className="text-xl font-bold text-slate-900 leading-tight">
-                New Order Assigned
-              </DialogTitle>
-              <p className="text-sm font-medium text-slate-500">
-                Order #284-9321
-              </p>
-            </div>
+            <h3 className="text-2xl font-bold text-slate-900 animate-in slide-in-from-bottom-2 duration-300 delay-100">
+              Order Accepted!
+            </h3>
+            <p className="text-slate-500 font-medium max-w-[250px] animate-in slide-in-from-bottom-2 duration-300 delay-200">
+              Pickup scheduled for today, 2-4 PM.
+            </p>
           </div>
-          <Badge className="bg-orange-100 text-orange-600 hover:bg-orange-100 border-none px-3 py-1 text-xs font-bold uppercase tracking-wider gap-1 rounded-full">
-            <Zap className="h-3 w-3 fill-orange-600" /> EXPRESS
-          </Badge>
-        </div>
-
-        {/* Content Scrollable */}
-        <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-          {/* Items Summary */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Items Summary (
-                {SAMPLE_ITEMS.reduce((acc, item) => acc + item.count, 0)})
-              </h3>
-              <button
-                onClick={() => setShowDetails(true)}
-                className="text-xs font-bold text-[#3E8940] cursor-pointer hover:underline outline-none"
-              >
-                View details
-              </button>
-            </div>
-            {/* Item List Box */}
-            <div className="bg-white rounded-xl p-2 border border-slate-100 space-y-1">
-              {SAMPLE_ITEMS.slice(0, 2).map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => setShowDetails(true)}
-                  className="flex items-center gap-4 p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer"
-                >
-                  <div className="relative shrink-0">
-                    <div className="h-12 w-12 rounded-lg flex items-center justify-center overflow-hidden relative bg-slate-100">
-                      <img
-                        src={item.images[0]}
-                        alt={item.name}
-                        className="absolute inset-0 h-full w-full object-cover"
-                      />
-                    </div>
-                    <Badge className="absolute -top-1.5 -right-1.5 h-5 w-5 p-0 flex items-center justify-center rounded-full bg-white border shadow-sm text-[10px] text-slate-700 z-10">
-                      x{item.count}
-                    </Badge>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="p-5 pb-0 bg-white">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                    <Bell className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-slate-900">
-                      {item.name}
+                    <DialogTitle className="text-xl font-black text-slate-900 leading-tight">
+                      New Order Assigned
+                    </DialogTitle>
+                    <p className="text-slate-500 font-medium text-sm">
+                      Order #284-9321
                     </p>
-                    <Badge
-                      className={cn(
-                        "mt-1 border-0 px-1.5 py-0 text-[10px] uppercase font-bold tracking-wide rounded-md",
-                        getBadgeColor(item.type),
-                      )}
-                    >
-                      {item.service}
-                    </Badge>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Details Dialog */}
-          <Dialog open={showDetails} onOpenChange={setShowDetails}>
-            <DialogContent className="sm:max-w-[500px] bg-white p-0 gap-0 overflow-hidden shadow-2xl transition-all">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-20">
-                <DialogTitle className="text-xl font-bold text-slate-900">
-                  Order Items (
-                  {SAMPLE_ITEMS.reduce((acc, item) => acc + item.count, 0)})
-                </DialogTitle>
+                {/* Close Button replacement or just standard X provided by DialogPrimitive? 
+                    ShadCN Dialog usually has a Close button. We can leave it or hide it. 
+                    Assuming DialogContent has a close button by default if we strictly follow standard shadcn. 
+                    However, custom header here. 
+                */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-slate-400 -mr-2 -mt-2"
+                  onClick={() => onOpenChange(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </Button>
               </div>
-              <div className="p-6 max-h-[70vh] overflow-y-auto bg-slate-50/30 scrollbar-primary">
-                <div className="space-y-6 pb-4">
-                  {Object.entries(
-                    SAMPLE_ITEMS.reduce(
-                      (acc, item) => {
-                        if (!acc[item.type]) acc[item.type] = [];
-                        acc[item.type].push(item);
-                        return acc;
-                      },
-                      {} as Record<string, typeof SAMPLE_ITEMS>,
-                    ),
-                  ).map(([type, items]) => (
-                    <div key={type} className="space-y-3">
-                      <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider pl-1">
-                        {type}
-                      </h4>
-                      <div className="space-y-3">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex flex-col gap-4 p-5 bg-white hover:bg-slate-50/50 rounded-2xl transition-all border border-slate-100 shadow-sm"
-                          >
-                            {/* Header: Title/Service & Badge */}
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h5 className="text-base font-bold text-slate-900 leading-tight">
-                                  {item.name}
-                                </h5>
-                                <p className="text-sm text-slate-500 font-medium mt-1">
-                                  {item.service}
-                                </p>
-                              </div>
-                              <Badge
-                                className={cn(
-                                  "border-0 px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full",
-                                  getBadgeColor(item.type),
-                                )}
-                              >
-                                {item.type.toUpperCase()}
-                              </Badge>
-                            </div>
 
-                            {/* Images Grid */}
-                            <div className="flex flex-wrap gap-3">
-                              {item.images.map((img, idx) => {
-                                const isSelected = selectedImages.includes(img);
-                                return (
-                                  <div
-                                    key={idx}
-                                    onClick={() => toggleImageSelection(img)}
+              <div className="flex items-center justify-between">
+                <Badge
+                  variant="secondary"
+                  className="bg-orange-50 text-orange-600 border-orange-100 font-bold px-2 py-0.5 rounded-md flex items-center gap-1.5"
+                >
+                  <Zap className="h-3 w-3 fill-orange-600" />
+                  EXPRESS
+                </Badge>
+              </div>
+            </div>
+
+            <div className="p-4 space-y-5">
+              {/* Items Summary */}
+              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm transition-all hover:shadow-md">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    ITEMS SUMMARY (
+                    {SAMPLE_ITEMS.reduce((acc, item) => acc + item.count, 0)})
+                  </h4>
+                  <button
+                    onClick={() => setShowDetails(true)}
+                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline transition-all"
+                  >
+                    View details
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
+                        <img
+                          src={SAMPLE_ITEMS[0].images[0]}
+                          alt={SAMPLE_ITEMS[0].name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-slate-900 text-white text-[10px] border-2 border-white cursor-default">
+                        x{SAMPLE_ITEMS[0].count}
+                      </Badge>
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-slate-900 text-sm">
+                        {SAMPLE_ITEMS[0].name}
+                      </h5>
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "mt-1 text-[10px] px-1.5 py-0 font-bold h-5",
+                          getBadgeColor(SAMPLE_ITEMS[0].type),
+                        )}
+                      >
+                        {SAMPLE_ITEMS[0].service}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden border border-slate-200">
+                        <img
+                          src={SAMPLE_ITEMS[1].images[0]}
+                          alt={SAMPLE_ITEMS[1].name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-slate-900 text-white text-[10px] border-2 border-white cursor-default">
+                        x{SAMPLE_ITEMS[1].count}
+                      </Badge>
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-slate-900 text-sm">
+                        {SAMPLE_ITEMS[1].name}
+                      </h5>
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "mt-1 text-[10px] px-1.5 py-0 font-bold h-5",
+                          getBadgeColor(SAMPLE_ITEMS[1].type),
+                        )}
+                      >
+                        {SAMPLE_ITEMS[1].service}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detail Dialog */}
+              <Dialog open={showDetails} onOpenChange={setShowDetails}>
+                <DialogContent className="max-w-2xl max-h-[90vh] p-0 gap-0 overflow-hidden bg-white">
+                  <div className="p-6 border-b border-slate-100 bg-white sticky top-0 z-20 flex items-center justify-between">
+                    <DialogTitle className="text-xl font-bold text-slate-900">
+                      Order Details (
+                      {SAMPLE_ITEMS.reduce((acc, item) => acc + item.count, 0)})
+                    </DialogTitle>
+                  </div>
+                  <div className="p-6 max-h-[70vh] overflow-y-auto bg-slate-50/30 scrollbar-primary">
+                    <div className="space-y-6 pb-4">
+                      {Object.entries(
+                        SAMPLE_ITEMS.reduce(
+                          (acc, item) => {
+                            if (!acc[item.type]) acc[item.type] = [];
+                            acc[item.type].push(item);
+                            return acc;
+                          },
+                          {} as Record<string, typeof SAMPLE_ITEMS>,
+                        ),
+                      ).map(([type, items]) => (
+                        <div key={type} className="space-y-3">
+                          <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider pl-1">
+                            {type}
+                          </h4>
+                          <div className="space-y-3">
+                            {items.map((item) => (
+                              <div
+                                key={item.id}
+                                className="flex flex-col gap-4 p-5 bg-white hover:bg-slate-50/50 rounded-2xl transition-all border border-slate-100 shadow-sm"
+                              >
+                                {/* Header: Title/Service & Badge */}
+                                <div className="flex items-start justify-between">
+                                  <div>
+                                    <h5 className="text-base font-bold text-slate-900 leading-tight">
+                                      {item.name}
+                                    </h5>
+                                    <p className="text-sm text-slate-500 font-medium mt-1">
+                                      {item.service}
+                                    </p>
+                                  </div>
+                                  <Badge
                                     className={cn(
-                                      "group relative h-16 w-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm cursor-pointer transition-all",
-                                      isSelected &&
-                                        "ring-2 ring-[#3E8940] ring-offset-2",
+                                      "border-0 px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full",
+                                      getBadgeColor(item.type),
                                     )}
                                   >
-                                    <img
-                                      src={img}
-                                      alt={`${item.name} ${idx + 1}`}
-                                      className="h-full w-full object-cover"
-                                    />
-                                    {/* Selection indicator overlay */}
-                                    <div
-                                      className={cn(
-                                        "absolute inset-0 transition-colors flex items-center justify-center",
-                                        isSelected
-                                          ? "bg-black/20"
-                                          : "bg-black/0 group-hover:bg-black/5",
-                                      )}
-                                    >
-                                      {isSelected && (
-                                        <div className="bg-[#3E8940] rounded-full p-1 shadow-sm">
-                                          <Check
-                                            className="h-4 w-4 text-white"
-                                            strokeWidth={3}
-                                          />
+                                    {item.type.toUpperCase()}
+                                  </Badge>
+                                </div>
+
+                                {/* Images Grid */}
+                                <div className="flex flex-wrap gap-3">
+                                  {item.images.map((img, idx) => {
+                                    const isSelected =
+                                      selectedImages.includes(img);
+                                    return (
+                                      <div
+                                        key={idx}
+                                        onClick={() =>
+                                          toggleImageSelection(img)
+                                        }
+                                        className={cn(
+                                          "group relative h-16 w-16 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm cursor-pointer transition-all",
+                                          isSelected &&
+                                            "ring-2 ring-[#3E8940] ring-offset-2",
+                                        )}
+                                      >
+                                        <img
+                                          src={img}
+                                          alt={`${item.name} ${idx + 1}`}
+                                          className="h-full w-full object-cover"
+                                        />
+                                        {/* Selection indicator overlay */}
+                                        <div
+                                          className={cn(
+                                            "absolute inset-0 transition-colors flex items-center justify-center",
+                                            isSelected
+                                              ? "bg-black/20"
+                                              : "bg-black/0 group-hover:bg-black/5",
+                                          )}
+                                        >
+                                          {isSelected && (
+                                            <div className="bg-[#3E8940] rounded-full p-1 shadow-sm">
+                                              <Check
+                                                className="h-4 w-4 text-white"
+                                                strokeWidth={3}
+                                              />
+                                            </div>
+                                          )}
                                         </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div className="p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20">
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-slate-200 text-slate-700 font-bold h-12 rounded-xl text-base hover:bg-slate-50 hover:text-slate-900"
-                    onClick={() => setShowDetails(false)}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    className="flex-1 bg-[#3E8940] text-white font-bold h-12 rounded-xl text-base hover:bg-[#3E8940]/90 shadow-lg shadow-emerald-500/20"
-                    onClick={() => {
-                      setShowDetails(false);
-                      onOpenChange(false);
-                      router.push("/dashboard/schedule");
-                    }}
-                  >
-                    Confirm
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+                  </div>
+                  <div className="p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20">
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex-1 border-slate-200 text-slate-700 font-bold h-12 rounded-xl text-base hover:bg-slate-50 hover:text-slate-900"
+                        onClick={() => setShowDetails(false)}
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        className="flex-1 bg-[#3E8940] text-white font-bold h-12 rounded-xl text-base hover:bg-[#3E8940]/90 shadow-lg shadow-emerald-500/20"
+                        onClick={() => {
+                          setShowDetails(false);
+                          onOpenChange(false);
+                          router.push("/dashboard/schedule");
+                        }}
+                      >
+                        Confirm
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-          {/* Grid Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
-              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                <Shirt className="h-3.5 w-3.5" /> SERVICE
-              </div>
-              <p className="font-bold text-slate-900 text-sm">Wash & Fold</p>
-            </div>
-            <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
-              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                <Clock className="h-3.5 w-3.5" /> PICKUP
-              </div>
-              <p className="font-bold text-slate-900 text-sm">
-                Today, 2pm - 4pm
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
-              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                <Calendar className="h-3.5 w-3.5" /> DEADLINE
-              </div>
-              <p className="font-bold text-slate-900 text-sm">Tomorrow, 10am</p>
-            </div>
-            <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
-              <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                <MapPin className="h-3.5 w-3.5" /> DISTANCE
-              </div>
-              <p className="font-bold text-slate-900 text-sm">2.4 miles away</p>
-            </div>
-          </div>
-
-          {/* Address & Map */}
-          <div className="bg-white rounded-xl border border-slate-100 overflow-hidden flex h-18 shadow-sm">
-            <div className="flex-1 p-3 pl-4 flex flex-col justify-center">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                PICKUP ADDRESS
-              </p>
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 text-slate-400 mt-0.5" />
-                <div>
-                  <p className="text-sm font-bold text-slate-900 leading-tight">
-                    452 Maple Ave, Apt 4B
+              {/* Grid Stats */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <Shirt className="h-3.5 w-3.5" /> SERVICE
+                  </div>
+                  <p className="font-bold text-slate-900 text-sm">
+                    Wash & Fold
                   </p>
-                  <p className="text-[11px] text-slate-400">
-                    San Francisco, CA 94110
+                </div>
+                <div className="bg-white p-3 rounded-xl border border-slate-100 flex flex-col gap-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <Clock className="h-3.5 w-3.5" /> PICKUP
+                  </div>
+                  <p className="font-bold text-slate-900 text-sm">
+                    Today, 2pm - 4pm
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="w-28 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[8px_8px] bg-white relative flex items-center justify-center border-l border-slate-100">
-              <div className="relative flex items-center justify-center translate-y-[-4px]">
-                <MapPin
-                  className="h-14 w-14 text-[#1a1f1c]"
-                  strokeWidth={1.5}
-                />
-                <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <MapPin className="h-4 w-4 text-[#3E8940] fill-[#3E8940]" />
+
+              {/* Earning */}
+              <div className="bg-[#3E8940]/5 rounded-xl border border-[#3E8940]/10 p-3 flex items-center justify-center gap-3">
+                <div className="h-9 w-9 rounded-full bg-[#3E8940]/10 flex items-center justify-center text-[#3E8940]">
+                  <Banknote className="h-5 w-5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Your Earning
+                  </span>
+                  <span className="text-xl font-black text-[#3E8940] tracking-tight">
+                    ₹24.50
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Earning */}
-          <div className="bg-[#3E8940]/5 rounded-xl border border-[#3E8940]/10 p-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#3E8940]/10 flex items-center justify-center text-[#3E8940]">
-                <Banknote className="h-5 w-5" />
+            {/* Report Problem Modal */}
+            <ReportProblemModal
+              open={showReportProblem}
+              onOpenChange={setShowReportProblem}
+              orderId="284-9321"
+            />
+
+            {/* Footer Actions */}
+            <div className="bg-white p-5 pt-2 pb-5 border-t border-slate-50 flex flex-col gap-4">
+              <p className="text-center text-[12px] text-slate-400 font-medium leading-tight px-4">
+                By accepting, you agree to fulfil this order within the
+                specified time window.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-12 border-slate-200 text-slate-700 font-bold text-base hover:bg-slate-50 hover:text-slate-900 rounded-xl"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Decline Order
+                </Button>
+                <Button
+                  className="h-12 bg-[#3E8940] hover:bg-[#3E8940]/90 text-white font-bold text-base shadow-lg shadow-emerald-500/20 rounded-xl"
+                  onClick={handleAcceptOrder}
+                >
+                  Accept Order <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
-              <span className="font-bold text-slate-700">Your Earning</span>
+              <button
+                onClick={() => setShowReportProblem(true)}
+                className="flex items-center justify-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium transition-colors"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                Report Problem
+              </button>
             </div>
-            <span className="text-2xl font-black text-[#3E8940] tracking-tight">
-              ₹24.50
-            </span>
-          </div>
-        </div>
-
-        {/* Report Problem Modal */}
-        <ReportProblemModal
-          open={showReportProblem}
-          onOpenChange={setShowReportProblem}
-          orderId="284-9321"
-        />
-
-        {/* Footer Actions */}
-        <div className="bg-white p-5 pt-2 pb-5 border-t border-slate-50 flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              className="h-12 border-slate-200 text-slate-700 font-bold text-base hover:bg-slate-50 hover:text-slate-900 rounded-xl"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button className="h-12 bg-[#3E8940] hover:bg-[#3E8940]/90 text-white font-bold text-base shadow-lg shadow-emerald-500/20 rounded-xl">
-              Accept Order <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-          <button
-            onClick={() => setShowReportProblem(true)}
-            className="flex items-center justify-center gap-2 text-red-500 hover:text-red-600 text-sm font-medium transition-colors"
-          >
-            <AlertTriangle className="h-4 w-4" />
-            Report Problem
-          </button>
-          <p className="text-center text-[10px] text-slate-400 font-medium">
-            By accepting, you agree to fulfill the order within the specified
-            window.
-          </p>
-        </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

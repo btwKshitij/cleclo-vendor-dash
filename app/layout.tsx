@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Poppins, Quicksand } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -52,6 +53,7 @@ export default function RootLayout({
       >
         {children}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   );

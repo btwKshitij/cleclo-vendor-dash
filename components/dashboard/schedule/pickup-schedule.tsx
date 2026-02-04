@@ -12,6 +12,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Calendar,
@@ -27,6 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +47,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94110",
     date: "Jan 21, 2026",
     items: 5,
-    status: "scheduled",
+    status: "pickup_scheduled",
     type: "pickup",
     rating: 4.8,
     note: "Coffee stain on front",
@@ -70,7 +77,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94102",
     date: "Jan 21, 2026",
     items: 3,
-    status: "in_progress",
+    status: "in_workshop",
     type: "pickup",
     rating: 4.9,
     note: "Oil stain on white shirt collar",
@@ -94,7 +101,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94108",
     date: "Jan 21, 2026",
     items: 8,
-    status: "scheduled",
+    status: "ready_for_delivery",
     type: "delivery",
     rating: 4.7,
     deliveryType: "Standard",
@@ -108,7 +115,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94114",
     date: "Jan 21, 2026",
     items: 4,
-    status: "scheduled",
+    status: "picked_up",
     type: "pickup",
     rating: 5.0,
     note: "Delicate silk items",
@@ -138,7 +145,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94117",
     date: "Jan 21, 2026",
     items: 6,
-    status: "scheduled",
+    status: "ready_for_delivery",
     type: "delivery",
     rating: 4.6,
     deliveryType: "Express 24h",
@@ -152,7 +159,7 @@ const SCHEDULE_DATA = [
     city: "San Francisco, CA 94109",
     date: "Jan 21, 2026",
     items: 3,
-    status: "scheduled",
+    status: "completed",
     type: "delivery",
     rating: 4.8,
     deliveryType: "Express 48h",
@@ -219,29 +226,41 @@ const SCHEDULE_DATA = [
 
 const getStatusConfig = (status: string, type: string) => {
   switch (status) {
-    case "scheduled":
+    case "not_scheduled":
       return {
-        label: type === "pickup" ? "Pickup" : "Delivery Scheduled",
+        label: "Not Scheduled",
+        className: "bg-gray-100 text-gray-700 border-gray-200",
+        icon: Clock,
+      };
+    case "pickup_scheduled":
+      return {
+        label: "Pickup Scheduled",
         className: "bg-blue-100 text-blue-700 border-blue-200",
         icon: Timer,
       };
-    case "in_progress":
+    case "picked_up":
       return {
-        label: "In Progress",
-        className: "bg-orange-100 text-orange-700 border-orange-200",
+        label: "Picked Up",
+        className: "bg-indigo-100 text-indigo-700 border-indigo-200",
         icon: Truck,
+      };
+    case "in_workshop":
+      return {
+        label: "In Workshop",
+        className: "bg-orange-100 text-orange-700 border-orange-200",
+        icon: Package,
+      };
+    case "ready_for_delivery":
+      return {
+        label: "Ready for Delivery",
+        className: "bg-emerald-100 text-emerald-700 border-emerald-200",
+        icon: CheckCircle2,
       };
     case "completed":
       return {
         label: "Completed",
         className: "bg-green-100 text-green-700 border-green-200",
         icon: CheckCircle2,
-      };
-    case "not_scheduled":
-      return {
-        label: "Not Scheduled",
-        className: "bg-gray-100 text-gray-700 border-gray-200",
-        icon: Clock,
       };
     default:
       return {
@@ -342,7 +361,7 @@ export function PickupSchedule() {
             Pickup Schedule
           </h1>
           <p className="text-primary mt-1">
-            Manage your pickups and deliveries for today
+            Manage today’s pickups and delivery assignments.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -403,7 +422,7 @@ export function PickupSchedule() {
       </div>
 
       {/* Schedule Table */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Today's Schedule</h2>
           <div className="flex items-center gap-2">
@@ -415,14 +434,14 @@ export function PickupSchedule() {
         </div>
 
         {/* Table Header */}
-        <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        <div className="hidden md:grid md:grid-cols-14 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider rounded-t-xl">
           <div className="col-span-2">Date</div>
           <div className="col-span-1">Rating</div>
           <div className="col-span-2">Delivery Person</div>
           <div className="col-span-2">Message</div>
-          <div className="col-span-1">Speed</div>
+          <div className="col-span-2">Speed</div>
           <div className="col-span-1 text-center">Items</div>
-          <div className="col-span-1 text-center">Status</div>
+          <div className="col-span-2 text-center">Status</div>
           <div className="col-span-2 text-right">Actions</div>
         </div>
 
@@ -430,16 +449,22 @@ export function PickupSchedule() {
         <div className="divide-y divide-slate-100">
           {SCHEDULE_DATA.filter(
             (s) =>
-              s.type === "pickup" &&
-              (s.status === "scheduled" ||
-                s.status === "in_progress" ||
-                s.status === "not_scheduled"),
+              s.status === "pickup_scheduled" ||
+              s.status === "picked_up" ||
+              s.status === "in_workshop" ||
+              s.status === "ready_for_delivery" ||
+              s.status === "completed" ||
+              s.status === "not_scheduled",
           )
             .sort((a, b) => {
               const getStatusWeight = (status: string) => {
                 if (status === "not_scheduled") return 0;
-                if (status === "in_progress") return 1;
-                return 2;
+                if (status === "pickup_scheduled") return 1;
+                if (status === "picked_up") return 2;
+                if (status === "in_workshop") return 3;
+                if (status === "ready_for_delivery") return 4;
+                if (status === "completed") return 5;
+                return 6;
               };
               return getStatusWeight(a.status) - getStatusWeight(b.status);
             })
@@ -460,7 +485,7 @@ export function PickupSchedule() {
                   )}
                 >
                   {/* Desktop Layout */}
-                  <div className="hidden md:grid md:grid-cols-12 gap-4 items-center">
+                  <div className="hidden md:grid md:grid-cols-14 gap-4 items-center">
                     {/* Date */}
                     <div className="col-span-2">
                       <div className="flex items-center gap-3">
@@ -492,8 +517,13 @@ export function PickupSchedule() {
                         <span className="font-bold">{schedule.rating}</span>
                         <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
                       </div>
-                      <div className="text-xs text-slate-400 mt-0.5">
-                        {schedule.orderId}
+                      <div className="flex flex-col mt-0.5">
+                        <span className="text-xs text-slate-400 font-medium">
+                          {schedule.orderId}
+                        </span>
+                        <span className="text-[9px] text-slate-400/70 leading-tight">
+                          Customer rating based on past orders
+                        </span>
                       </div>
                     </div>
 
@@ -511,21 +541,39 @@ export function PickupSchedule() {
                     </div>
 
                     {/* Message */}
-                    <div className="col-span-2">
-                      <p className="text-sm text-slate-600 italic truncate">
+                    <div className="col-span-2 relative group">
+                      <p className="text-sm text-slate-600 italic truncate cursor-help">
                         {schedule.note || "-"}
                       </p>
+                      {schedule.note && (
+                        <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-slate-900 text-white text-xs rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+                          <p className="font-medium mb-1">Note:</p>
+                          {schedule.note}
+                          {/* Arrow */}
+                          <div className="absolute top-full left-4 -mt-px border-4 border-transparent border-t-slate-900"></div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Speed */}
-                    <div className="col-span-1">
+                    <div className="col-span-2">
                       <Badge
                         className={cn(
                           "border px-2.5 py-0.5 whitespace-nowrap",
                           getDeliveryBadgeColor(schedule.deliveryType),
                         )}
                       >
-                        {schedule.deliveryType || "Standard"}
+                        {schedule.deliveryType === "Express 24h" ? (
+                          <>
+                            Express 24H <span className="ml-1">⚡⚡</span>
+                          </>
+                        ) : schedule.deliveryType === "Express 48h" ? (
+                          <>
+                            Express 48H <span className="ml-1">⚡</span>
+                          </>
+                        ) : (
+                          "Standard"
+                        )}
                       </Badge>
                     </div>
 
@@ -537,7 +585,7 @@ export function PickupSchedule() {
                     </div>
 
                     {/* Status */}
-                    <div className="col-span-1 flex justify-center">
+                    <div className="col-span-2 flex justify-center">
                       <Badge
                         className={cn(
                           "gap-1 px-2.5 py-1 text-[11px] font-semibold border whitespace-nowrap",
