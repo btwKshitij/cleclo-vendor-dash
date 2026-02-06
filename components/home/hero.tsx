@@ -143,6 +143,32 @@ const DashboardMockup = () => (
       </div>
     </motion.div>
 
+    {/* Who It's For Section */}
+    <div className="mt-8">
+      <h3 className="text-white/90 font-semibold mb-4 pl-1">Who It's For</h3>
+      <div className="grid grid-cols-2 gap-3">
+        {[
+          "Independent Laundry Owners",
+          "Multi Outlet Operators",
+          "Backend Vendor Partners",
+          "Franchise Owners",
+        ].map((item, i) => (
+          <motion.div
+            key={i}
+            className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.8 + i * 0.1 }}
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(var(--secondary),0.8)] shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white/90">
+              {item}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+
     {/* Floating notification card */}
     <motion.div
       className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20 shadow-xl"
