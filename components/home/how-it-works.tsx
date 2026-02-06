@@ -164,7 +164,7 @@ export default function HowItWorks() {
                 >
                   {/* Content card */}
                   <div
-                    className={`w-full md:w-5/12 ${isEven ? "md:pr-12 md:text-right" : "md:pl-12 md:text-left"}`}
+                    className={`w-full md:w-5/12 ${isEven ? "md:pr-12" : "md:pl-12"} text-left`}
                   >
                     <motion.div
                       className="bg-background rounded-2xl p-8 border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 group"
