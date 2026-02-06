@@ -11,6 +11,7 @@ import {
   DollarSign,
   BarChart3,
   Clock,
+  IndianRupee,
 } from "lucide-react";
 
 export default function VendorBenefits() {
@@ -70,7 +71,7 @@ export default function VendorBenefits() {
       delay: 0.5,
     },
     {
-      icon: DollarSign,
+      icon: IndianRupee,
       title: "Transparent Pricing",
       description:
         "Configurable pricing rules with automatic GST calculation, invoicing and tax-ready reporting.",
@@ -79,7 +80,7 @@ export default function VendorBenefits() {
       delay: 0.6,
     },
     {
-      icon: DollarSign,
+      icon: TrendingUp,
       title: "Vendor Performance Scoring",
       description:
         "Vendor performance tracking based on turnaround time, order accuracy and SLA compliance.",
@@ -151,7 +152,7 @@ export default function VendorBenefits() {
               Scale Your Laundry Business with Confidence.
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-4xl mx-auto">
             Ideal for independent laundry owners, multi-outlet operators and
             backend vendors.
           </p>

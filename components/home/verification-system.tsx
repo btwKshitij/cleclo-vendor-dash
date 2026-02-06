@@ -100,7 +100,7 @@ export default function VerificationSystem() {
               return (
                 <motion.div
                   key={index}
-                  className="relative group"
+                  className="relative group h-full"
                   initial={{ opacity: 0, y: 40 }}
                   animate={
                     isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }
@@ -129,7 +129,7 @@ export default function VerificationSystem() {
                   )}
 
                   <motion.div
-                    className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-slate-200 transition-all duration-300 text-center relative overflow-hidden shadow-sm hover:shadow-lg"
+                    className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-slate-200 transition-all duration-300 text-left relative overflow-hidden shadow-sm hover:shadow-lg h-full flex flex-col"
                     whileHover={{ y: -5, scale: 1.02 }}
                     transition={{ duration: 0.25 }}
                   >
@@ -139,7 +139,7 @@ export default function VerificationSystem() {
                     </div>
 
                     {/* Icon with badge */}
-                    <div className="relative inline-flex mb-5">
+                    <div className="relative inline-flex mb-5 self-start">
                       <motion.div
                         className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg`}
                         whileHover={{ scale: 1.08, rotate: 3 }}
