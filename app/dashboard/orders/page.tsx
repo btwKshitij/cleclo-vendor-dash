@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   ChevronDown,
   ChevronRight,
   Filter,
@@ -13,6 +13,7 @@ import {
   Package,
   Truck,
   CheckCircle2,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import {
+  format,
+  isWithinInterval,
+  subDays,
+  startOfDay,
+  endOfDay,
+  differenceInDays,
+  isSameDay,
+} from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 type OrderStatus = "new" | "accepted" | "processing" | "ready" | "completed";
 type ServiceSpeed = "economy" | "fast" | "express";
@@ -41,6 +58,7 @@ interface Order {
   distance: string;
   earning: string;
   customerName: string;
+  isoDate: string;
 }
 
 const ORDERS: Order[] = [
@@ -58,6 +76,7 @@ const ORDERS: Order[] = [
     distance: "1.2 km",
     earning: "₹140",
     customerName: "John Smith",
+    isoDate: "2026-02-07T14:00:00",
   },
   {
     id: "ORD-4921",
@@ -72,6 +91,7 @@ const ORDERS: Order[] = [
     distance: "3.5 km",
     earning: "₹220",
     customerName: "Sarah Johnson",
+    isoDate: "2026-02-07T16:30:00",
   },
   {
     id: "ORD-4925",
@@ -86,6 +106,7 @@ const ORDERS: Order[] = [
     distance: "5.0 km",
     earning: "₹500",
     customerName: "Mike Chen",
+    isoDate: "2026-02-07T17:00:00",
   },
   // Accepted Orders
   {
@@ -101,6 +122,7 @@ const ORDERS: Order[] = [
     distance: "2.1 km",
     earning: "₹350",
     customerName: "David Wilson",
+    isoDate: "2026-02-07T11:00:00",
   },
   {
     id: "ORD-4916",
@@ -115,6 +137,7 @@ const ORDERS: Order[] = [
     distance: "1.8 km",
     earning: "₹280",
     customerName: "Emily Brown",
+    isoDate: "2026-02-07T13:00:00",
   },
   // Processing Orders
   {
@@ -130,6 +153,7 @@ const ORDERS: Order[] = [
     distance: "4.2 km",
     earning: "₹420",
     customerName: "Alex Turner",
+    isoDate: "2026-02-06T15:00:00",
   },
   {
     id: "ORD-4910",
@@ -144,6 +168,7 @@ const ORDERS: Order[] = [
     distance: "2.5 km",
     earning: "₹800",
     customerName: "Lisa Anderson",
+    isoDate: "2026-02-07T09:00:00",
   },
   {
     id: "ORD-4908",
@@ -158,6 +183,7 @@ const ORDERS: Order[] = [
     distance: "3.0 km",
     earning: "₹600",
     customerName: "Corporate Client",
+    isoDate: "2026-02-06T17:00:00",
   },
   {
     id: "ORD-4905",
@@ -172,6 +198,7 @@ const ORDERS: Order[] = [
     distance: "5.5 km",
     earning: "₹380",
     customerName: "Robert Kim",
+    isoDate: "2026-02-05T14:00:00", // approx 2 PM
   },
   {
     id: "ORD-4902",
@@ -186,6 +213,7 @@ const ORDERS: Order[] = [
     distance: "1.9 km",
     earning: "₹320",
     customerName: "James Lee",
+    isoDate: "2026-02-06T14:00:00",
   },
   // Ready Orders
   {
@@ -201,6 +229,7 @@ const ORDERS: Order[] = [
     distance: "2.8 km",
     earning: "₹450",
     customerName: "Tom Harris",
+    isoDate: "2026-02-05T10:00:00",
   },
   {
     id: "ORD-4898",
@@ -215,6 +244,7 @@ const ORDERS: Order[] = [
     distance: "4.0 km",
     earning: "₹520",
     customerName: "Nancy White",
+    isoDate: "2026-02-04T10:00:00",
   },
   // Completed Orders
   {
@@ -230,6 +260,7 @@ const ORDERS: Order[] = [
     distance: "3.2 km",
     earning: "₹650",
     customerName: "Jennifer Davis",
+    isoDate: "2026-02-06T10:00:00",
   },
   {
     id: "ORD-4890",
@@ -244,6 +275,7 @@ const ORDERS: Order[] = [
     distance: "2.0 km",
     earning: "₹300",
     customerName: "Chris Martin",
+    isoDate: "2026-02-05T09:00:00",
   },
 ];
 
@@ -299,19 +331,63 @@ const getLeftBorderColor = (status: OrderStatus) => {
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>("new");
   const [serviceFilter, setServiceFilter] = useState<ServiceSpeed | "all">(
-    "all"
+    "all",
   );
   const [liveUpdates, setLiveUpdates] = useState(true);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
+  const [isExporting, setIsExporting] = useState(false);
 
   const filteredOrders = ORDERS.filter((order) => {
     const matchesTab = order.status === activeTab;
     const matchesService =
       serviceFilter === "all" || order.serviceSpeed === serviceFilter;
-    return matchesTab && matchesService;
+
+    let matchesDate = true;
+    if (date?.from && order.isoDate) {
+      const orderDate = new Date(order.isoDate);
+      matchesDate = isWithinInterval(orderDate, {
+        start: startOfDay(date.from),
+        end: endOfDay(date.to || date.from),
+      });
+    }
+
+    return matchesTab && matchesService && matchesDate;
   });
 
   const getTabCount = (status: OrderStatus) => {
     return ORDERS.filter((o) => o.status === status).length;
+  };
+
+  const handleExport = () => {
+    setIsExporting(true);
+    // Simulate export delay
+    setTimeout(() => {
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        "Order ID,Customer,Items,Service,Status,Earning,Date\n" +
+        filteredOrders
+          .map(
+            (o) =>
+              `${o.id},${o.customerName},"${o.items.replace(/,/g, " ")}",${o.service},${o.status},"${o.earning}",${o.isoDate}`,
+          )
+          .join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      const rangeStr = date?.from
+        ? `${format(date.from, "yyyy-MM-dd")}_to_${date.to ? format(date.to, "yyyy-MM-dd") : format(date.from, "yyyy-MM-dd")}`
+        : "all_time";
+      link.setAttribute("download", `orders_report_${rangeStr}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setIsExporting(false);
+    }, 1000);
   };
 
   return (
@@ -322,7 +398,8 @@ export default function OrdersPage() {
             Orders Dashboard
           </h1>
           <p className="text-slate-500">
-            Review, accept and manage laundry orders while tracking your earnings in real time.
+            Review, accept and manage laundry orders while tracking your
+            earnings in real time.
           </p>
         </div>
         <button
@@ -332,7 +409,7 @@ export default function OrdersPage() {
           <div
             className={cn(
               "h-2.5 w-2.5 rounded-full transition-colors",
-              liveUpdates ? "bg-[#3E8940] animate-pulse" : "bg-slate-300"
+              liveUpdates ? "bg-[#3E8940] animate-pulse" : "bg-slate-300",
             )}
           />
           <span className="text-sm font-medium text-slate-700">
@@ -354,7 +431,7 @@ export default function OrdersPage() {
                 "flex items-center gap-2 pb-3 px-1 border-b-2 transition-all whitespace-nowrap",
                 isActive
                   ? "border-[#3E8940] text-[#3E8940] font-bold"
-                  : "border-transparent text-slate-500 font-medium hover:text-slate-700 hover:border-slate-300"
+                  : "border-transparent text-slate-500 font-medium hover:text-slate-700 hover:border-slate-300",
               )}
             >
               {tab.label}
@@ -364,7 +441,7 @@ export default function OrdersPage() {
                     "px-2 py-0.5 text-xs rounded-full",
                     isActive
                       ? "bg-[#3E8940] text-white"
-                      : "bg-slate-200 text-slate-600"
+                      : "bg-slate-200 text-slate-600",
                   )}
                 >
                   {count}
@@ -388,13 +465,71 @@ export default function OrdersPage() {
           </SelectContent>
         </Select>
 
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="bg-white border-slate-200 h-10 rounded-xl font-medium text-slate-700 px-4"
+            >
+              <CalendarIcon className="w-4 h-4 mr-2" />
+              {date?.from ? (
+                date.to &&
+                differenceInDays(date.to, date.from) === 7 &&
+                isSameDay(date.to, new Date()) ? (
+                  "Last 7 Days"
+                ) : date.to ? (
+                  <>
+                    {format(date.from, "LLL dd")} - {format(date.to, "LLL dd")}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd")
+                )
+              ) : (
+                "Pick a date"
+              )}
+              <ChevronDown className="w-4 h-4 ml-2 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="flex gap-2 p-3 border-b border-slate-100">
+              <div className="flex-1">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                  From
+                </span>
+                <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                  {date?.from
+                    ? format(date.from, "MMM dd, yyyy")
+                    : "Select date"}
+                </div>
+              </div>
+              <div className="flex-1">
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                  To
+                </span>
+                <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                  {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
+                </div>
+              </div>
+            </div>
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={setDate as any}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+
         <Button
           variant="outline"
           className="bg-white border-slate-200 h-10 rounded-xl font-medium text-slate-700 px-4"
+          onClick={handleExport}
+          disabled={isExporting}
         >
-          <Calendar className="w-4 h-4 mr-2" />
-          Today
-          <ChevronDown className="w-4 h-4 ml-2 opacity-50" />
+          <Download className="h-4 w-4 mr-2" />
+          {isExporting ? "Exporting..." : "Export Data"}
         </Button>
 
         <div className="h-8 w-px bg-slate-200 mx-1" />
@@ -408,7 +543,7 @@ export default function OrdersPage() {
                 "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors capitalize",
                 serviceFilter === speed
                   ? "bg-[#3E8940]/10 text-[#3E8940] font-bold shadow-sm"
-                  : "text-slate-600 hover:bg-slate-200"
+                  : "text-slate-600 hover:bg-slate-200",
               )}
             >
               {speed === "all" ? "All" : speed}
@@ -441,7 +576,7 @@ export default function OrdersPage() {
               <div
                 className={cn(
                   "absolute left-0 top-0 bottom-0 w-1.5 rounded-l-full",
-                  getLeftBorderColor(order.status)
+                  getLeftBorderColor(order.status),
                 )}
               />
 
@@ -455,7 +590,7 @@ export default function OrdersPage() {
                     <Badge
                       className={cn(
                         "border-none uppercase text-[10px] font-bold tracking-wider rounded-md px-2 py-0.5",
-                        getStatusColor(order.status)
+                        getStatusColor(order.status),
                       )}
                     >
                       {order.status === "processing"
@@ -466,7 +601,7 @@ export default function OrdersPage() {
                       variant="outline"
                       className={cn(
                         "text-[10px] font-bold gap-1 rounded-md px-2 py-0.5 uppercase",
-                        getSpeedColor(order.serviceSpeed)
+                        getSpeedColor(order.serviceSpeed),
                       )}
                     >
                       <Clock className="w-3 h-3" />
@@ -606,7 +741,7 @@ export default function OrdersPage() {
             Total Earnings: ₹
             {filteredOrders.reduce(
               (sum, o) => sum + parseInt(o.earning.replace(/[₹,]/g, "")),
-              0
+              0,
             )}
           </span>
         </div>

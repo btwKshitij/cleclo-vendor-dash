@@ -12,7 +12,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
-const transactions = [
+import { useState } from "react";
+import { format } from "date-fns";
+
+interface Transaction {
+  id: string;
+  customer: string;
+  service: string;
+  date: string;
+  isoDate?: string;
+  amount: string;
+  status: string;
+  type: string;
+}
+
+interface RecentTransactionsProps {
+  transactions?: Transaction[];
+  dateRange?: string;
+}
+
+const DEFAULT_TRANSACTIONS: Transaction[] = [
   {
     id: "ORD-8291",
     customer: "Alice Freeman",
@@ -60,7 +79,41 @@ const transactions = [
   },
 ];
 
-export function RecentTransactions() {
+export function RecentTransactions({
+  transactions = DEFAULT_TRANSACTIONS,
+  dateRange = "All Time",
+}: RecentTransactionsProps) {
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    setIsExporting(true);
+    // Simulate export delay
+    setTimeout(() => {
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        "Transaction ID,Customer/Type,Service,Date,Status,Amount\n" +
+        transactions
+          .map(
+            (t) =>
+              `${t.id},"${t.customer} - ${t.type}",${t.service},${t.date},${t.status},"${t.amount}"`,
+          )
+          .join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute(
+        "download",
+        `earnings_statement_${dateRange.replace(/\s+/g, "_").toLowerCase()}_${format(new Date(), "yyyy-MM-dd")}.csv`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setIsExporting(false);
+    }, 1000);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border p-6">
       <div className="flex items-center justify-between mb-6">
@@ -72,8 +125,14 @@ export function RecentTransactions() {
             Real-time update of your earnings and payouts
           </p>
         </div>
-        <Button variant="outline" className="gap-2 text-slate-600">
-          <Download className="h-4 w-4" /> Download Statement
+        <Button
+          variant="outline"
+          className="gap-2 text-slate-600"
+          onClick={handleExport}
+          disabled={transactions.length === 0 || isExporting}
+        >
+          <Download className="h-4 w-4" />
+          {isExporting ? "Downloading..." : "Download Statement"}
         </Button>
       </div>
 

@@ -265,7 +265,7 @@ export default function Footer() {
 
             {/* Made with love badge */}
             <div className="flex items-center gap-2 text-xs text-white/40">
-              Made by Go Hype Media
+              <Link href="https://gohypemedia.com">Made by Go Hype Media</Link>
             </div>
           </motion.div>
         </div>

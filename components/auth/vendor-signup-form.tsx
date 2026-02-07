@@ -87,11 +87,38 @@ export function VendorSignupForm() {
   };
 
   const updateOutlet = (id: string, field: keyof Outlet, value: string) => {
-    setOutlets(
-      outlets.map((outlet) =>
+    setOutlets((prev) =>
+      prev.map((outlet) =>
         outlet.id === id ? { ...outlet, [field]: value } : outlet,
       ),
     );
+  };
+
+  const handlePincodeChange = async (id: string, value: string) => {
+    // Only allow numbers
+    if (!/^\d*$/.test(value)) return;
+
+    // Limit to 6 digits
+    if (value.length > 6) return;
+
+    updateOutlet(id, "pincode", value);
+
+    if (value.length === 6) {
+      try {
+        const response = await fetch(
+          `https://api.postalpincode.in/pincode/${value}`,
+        );
+        const data = await response.json();
+
+        if (data[0].Status === "Success" && data[0].PostOffice.length > 0) {
+          const { District, State } = data[0].PostOffice[0];
+          updateOutlet(id, "city", District);
+          updateOutlet(id, "state", State);
+        }
+      } catch (error) {
+        console.error("Error fetching pincode details:", error);
+      }
+    }
   };
 
   // OTP Verification State
@@ -99,6 +126,7 @@ export function VendorSignupForm() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState("");
   const [isVerified, setIsVerified] = useState(false);
+  const [gstRegistered, setGstRegistered] = useState("Select option");
 
   const handleVerifyOtp = () => {
     if (otp === "1234") {
@@ -309,12 +337,30 @@ export function VendorSignupForm() {
                     <label className="block text-sm font-semibold text-slate-900 mb-3">
                       GST Registered?
                     </label>
-                    <select className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10">
-                      <option>Select option</option>
-                      <option>Yes</option>
-                      <option>No</option>
+                    <select
+                      value={gstRegistered}
+                      onChange={(e) => setGstRegistered(e.target.value)}
+                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                    >
+                      <option value="Select option">Select option</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
                     </select>
                   </div>
+
+                  {gstRegistered === "Yes" && (
+                    <div className="group">
+                      <label className="block text-sm font-semibold text-slate-900 mb-3">
+                        GST Number
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter 15-digit GSTIN"
+                        className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                      />
+                    </div>
+                  )}
+
                   <div className="group">
                     <label className="block text-sm font-semibold text-slate-900 mb-3">
                       Business Type
@@ -331,8 +377,13 @@ export function VendorSignupForm() {
                   <label className="block text-sm font-semibold text-slate-900 mb-4">
                     Services Offered
                   </label>
-                  <div className="space-y-3">
-                    {["Dry Cleaning", "Washing", "Ironing"].map((service) => (
+                  <div className="grid grid-cols-2 gap-6">
+                    {[
+                      "Dry Cleaning",
+                      "Washing",
+                      "Steam Iron",
+                      "Darning/Repair",
+                    ].map((service) => (
                       <label
                         key={service}
                         className="flex items-center gap-4 p-4 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/30 cursor-pointer transition-all duration-200"
@@ -387,7 +438,7 @@ export function VendorSignupForm() {
                           </div>
                         )}
 
-                        <div className="grid sm:grid-cols-2 gap-6">
+                        <div className="space-y-6">
                           <div className="group">
                             <label className="block text-sm font-semibold text-slate-900 mb-3">
                               Outlet Name
@@ -405,71 +456,81 @@ export function VendorSignupForm() {
                               className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                             />
                           </div>
-                          <div className="group">
-                            <label className="block text-sm font-semibold text-slate-900 mt-6 mb-3">
-                              City
-                            </label>
-                            <input
-                              type="text"
-                              value={outlet.city}
-                              onChange={(e) =>
-                                updateOutlet(outlet.id, "city", e.target.value)
-                              }
-                              placeholder="City name"
-                              className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
-                            />
-                          </div>
-                        </div>
 
-                        <div className="mt-6">
-                          <label className="block text-sm font-semibold text-slate-900 mb-3">
-                            Street Address
-                          </label>
-                          <input
-                            type="text"
-                            value={outlet.address}
-                            onChange={(e) =>
-                              updateOutlet(outlet.id, "address", e.target.value)
-                            }
-                            placeholder="Enter complete address"
-                            className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
-                          />
-                        </div>
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="group">
+                              <label className="block text-sm font-semibold text-slate-900 mb-3">
+                                Street Address
+                              </label>
+                              <input
+                                type="text"
+                                value={outlet.address}
+                                onChange={(e) =>
+                                  updateOutlet(
+                                    outlet.id,
+                                    "address",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="Enter complete address"
+                                className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                              />
+                            </div>
+                            <div className="group">
+                              <label className="block text-sm font-semibold text-slate-900 mb-3">
+                                State
+                              </label>
+                              <input
+                                type="text"
+                                value={outlet.state}
+                                onChange={(e) =>
+                                  updateOutlet(
+                                    outlet.id,
+                                    "state",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="State"
+                                className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                              />
+                            </div>
+                          </div>
 
-                        <div className="grid sm:grid-cols-2 gap-6 mt-6">
-                          <div className="group">
-                            <label className="block text-sm font-semibold text-slate-900 mb-3">
-                              State
-                            </label>
-                            <input
-                              type="text"
-                              value={outlet.state}
-                              onChange={(e) =>
-                                updateOutlet(outlet.id, "state", e.target.value)
-                              }
-                              placeholder="State"
-                              className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
-                            />
+                          <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="group">
+                              <label className="block text-sm font-semibold text-slate-900 mb-3">
+                                City
+                              </label>
+                              <input
+                                type="text"
+                                value={outlet.city}
+                                onChange={(e) =>
+                                  updateOutlet(
+                                    outlet.id,
+                                    "city",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="City name"
+                                className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                              />
+                            </div>
+                            <div className="group">
+                              <label className="block text-sm font-semibold text-slate-900 mb-3">
+                                Pincode
+                              </label>
+                              <input
+                                type="text"
+                                value={outlet.pincode}
+                                onChange={(e) =>
+                                  handlePincodeChange(outlet.id, e.target.value)
+                                }
+                                placeholder="6-digit code"
+                                maxLength={6}
+                                className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                              />
+                            </div>
                           </div>
-                          <div className="group">
-                            <label className="block text-sm font-semibold text-slate-900 mb-3">
-                              Pincode
-                            </label>
-                            <input
-                              type="text"
-                              value={outlet.pincode}
-                              onChange={(e) =>
-                                updateOutlet(
-                                  outlet.id,
-                                  "pincode",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="6-digit code"
-                              className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
-                            />
-                          </div>
-                          {/* Removed Opening Time from here */}
                         </div>
 
                         <div className="mt-6">
@@ -633,60 +694,50 @@ export function VendorSignupForm() {
             )}
 
             {currentStep === 4 && (
-              <div className="space-y-6">
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 group">
-                  <div className="w-14 h-14 mx-auto mb-4 bg-slate-100 group-hover:bg-emerald-100 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <svg
-                      className="w-7 h-7 text-slate-600 group-hover:text-emerald-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  { title: "Aadhaar Card", desc: "Front and Back Copy" },
+                  { title: "PAN Card", desc: "Official PAN Card Copy" },
+                  { title: "Passport", desc: "First and Last Page" },
+                  {
+                    title: "GST Certificate",
+                    desc: "Official GST Registration",
+                  },
+                  {
+                    title: "Business Certificate",
+                    desc: "License / Registration",
+                  },
+                ].map((doc, index) => (
+                  <div
+                    key={index}
+                    className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 group"
+                  >
+                    <div className="w-12 h-12 mx-auto mb-3 bg-slate-100 group-hover:bg-emerald-100 rounded-full flex items-center justify-center transition-colors duration-200">
+                      <svg
+                        className="w-6 h-6 text-slate-600 group-hover:text-emerald-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <h4 className="font-bold text-slate-900 text-sm">
+                      {doc.title}
+                    </h4>
+                    <p className="text-xs text-slate-600 mt-1 mb-3">
+                      {doc.desc}
+                    </p>
+                    <button className="px-4 py-2 bg-emerald-500 text-white text-xs font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
+                      Choose File
+                    </button>
                   </div>
-                  <h4 className="font-bold text-slate-900 text-base">
-                    Business Proof
-                  </h4>
-                  <p className="text-sm text-slate-600 mt-2 mb-4">
-                    GST Certificate or Business License
-                  </p>
-                  <button className="px-6 py-3 bg-emerald-500 text-white text-sm font-semibold rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
-                    Choose File
-                  </button>
-                </div>
-
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 group">
-                  <div className="w-14 h-14 mx-auto mb-4 bg-slate-100 group-hover:bg-emerald-100 rounded-full flex items-center justify-center transition-colors duration-200">
-                    <svg
-                      className="w-7 h-7 text-slate-600 group-hover:text-emerald-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-4 0V5a2 2 0 10-4 0v5m0 0H5"
-                      />
-                    </svg>
-                  </div>
-                  <h4 className="font-bold text-slate-900 text-base">
-                    Owner ID Proof
-                  </h4>
-                  <p className="text-sm text-slate-600 mt-2 mb-4">
-                    Aadhaar, PAN, or Passport
-                  </p>
-                  <button className="px-6 py-3 bg-emerald-500 text-white text-sm font-semibold rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
-                    Choose File
-                  </button>
-                </div>
+                ))}
               </div>
             )}
 
