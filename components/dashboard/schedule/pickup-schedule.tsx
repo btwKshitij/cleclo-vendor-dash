@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   Clock,
   MapPin,
   Package,
@@ -34,8 +34,25 @@ import {
   ChevronRight,
   Star,
   Info,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  format,
+  isSameDay,
+  subDays,
+  isWithinInterval,
+  differenceInDays,
+} from "date-fns";
+import { DateRange } from "react-day-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+
+// ... existing code ...
 
 const SCHEDULE_DATA = [
   {
@@ -45,7 +62,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 123-4567",
     address: "452 Maple Ave, Apt 4B",
     city: "San Francisco, CA 94110",
-    date: "Jan 21, 2026",
+    date: "Feb 07, 2026",
+    isoDate: "2026-02-07T10:00:00",
     items: 5,
     status: "pickup_scheduled",
     type: "pickup",
@@ -75,7 +93,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 234-5678",
     address: "789 Oak Street, Suite 12",
     city: "San Francisco, CA 94102",
-    date: "Jan 21, 2026",
+    date: "Feb 07, 2026",
+    isoDate: "2026-02-07T14:30:00",
     items: 3,
     status: "in_workshop",
     type: "pickup",
@@ -99,7 +118,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 345-6789",
     address: "156 Pine Road",
     city: "San Francisco, CA 94108",
-    date: "Jan 21, 2026",
+    date: "Feb 06, 2026",
+    isoDate: "2026-02-06T09:00:00",
     items: 8,
     status: "ready_for_delivery",
     type: "delivery",
@@ -113,7 +133,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 456-7890",
     address: "321 Cedar Lane, Unit 5",
     city: "San Francisco, CA 94114",
-    date: "Jan 21, 2026",
+    date: "Feb 08, 2026",
+    isoDate: "2026-02-08T11:00:00",
     items: 4,
     status: "picked_up",
     type: "pickup",
@@ -143,7 +164,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 567-8901",
     address: "888 Birch Boulevard",
     city: "San Francisco, CA 94117",
-    date: "Jan 21, 2026",
+    date: "Feb 07, 2026",
+    isoDate: "2026-02-07T16:00:00",
     items: 6,
     status: "ready_for_delivery",
     type: "delivery",
@@ -157,7 +179,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 678-9012",
     address: "456 Pine St",
     city: "San Francisco, CA 94109",
-    date: "Jan 21, 2026",
+    date: "Feb 06, 2026",
+    isoDate: "2026-02-06T15:00:00",
     items: 3,
     status: "completed",
     type: "delivery",
@@ -172,7 +195,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 456-7890",
     address: "220 Elm St, Apt 5C",
     city: "San Francisco, CA 94103",
-    date: "Jan 21, 2026",
+    date: "Feb 07, 2026",
+    isoDate: "2026-02-07T09:30:00",
     items: 2,
     status: "not_scheduled",
     type: "pickup",
@@ -201,7 +225,8 @@ const SCHEDULE_DATA = [
     phone: "+1 (555) 987-6543",
     address: "789 Pine St",
     city: "San Francisco, CA 94108",
-    date: "Jan 21, 2026",
+    date: "Feb 08, 2026",
+    isoDate: "2026-02-08T13:00:00",
     items: 7,
     status: "not_scheduled",
     type: "pickup",
@@ -304,12 +329,59 @@ const getDeliveryBadgeColor = (type?: string) => {
 
 export function PickupSchedule() {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "pickups" | "completed" | "express" | "deliveries"
+  >("all");
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [verifiedItems, setVerifiedItems] = useState<{
     [key: string]: boolean;
   }>({});
+
+  const filteredSchedule = SCHEDULE_DATA.filter((s) => {
+    if (s.isoDate && date?.from) {
+      const orderDate = new Date(s.isoDate);
+      return isWithinInterval(orderDate, {
+        start: date.from,
+        end: date.to || date.from,
+      });
+    }
+    return false;
+  });
+
+  const handleExport = () => {
+    setIsExporting(true);
+    // Simulate export delay
+    setTimeout(() => {
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        "ID,Order ID,Customer,Phone,Address,City,Date,Items,Status,Type,Rating,Delivery Type,Driver,Note\n" +
+        filteredSchedule
+          .map(
+            (e) =>
+              `${e.id},${e.orderId},"${e.customer}",${e.phone},"${e.address}","${e.city}",${e.date},${e.items},${e.status},${e.type},${e.rating},${e.deliveryType},"${e.driver || ""}",${e.note || ""}`,
+          )
+          .join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      const rangeStr = date?.from
+        ? `${format(date.from, "yyyy-MM-dd")}_to_${date.to ? format(date.to, "yyyy-MM-dd") : format(date.from, "yyyy-MM-dd")}`
+        : "all_time";
+      link.setAttribute("download", `pickup_schedule_${rangeStr}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setIsExporting(false);
+    }, 1000);
+  };
 
   const handleOpenVerification = (order: any) => {
     setSelectedOrder(order);
@@ -330,27 +402,18 @@ export function PickupSchedule() {
     console.log("Verified items:", verifiedItems);
   };
 
-  const todayPickups = SCHEDULE_DATA.filter((s) => s.type === "pickup").length;
-  const completed = SCHEDULE_DATA.filter(
+  const todayPickups = filteredSchedule.filter(
+    (s) => s.type === "pickup",
+  ).length;
+  const completed = filteredSchedule.filter(
     (s) => s.status === "completed",
   ).length;
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const navigateDate = (direction: "prev" | "next") => {
-    setSelectedDate((prev) => {
-      const newDate = new Date(prev);
-      newDate.setDate(newDate.getDate() + (direction === "next" ? 1 : -1));
-      return newDate;
-    });
-  };
+  const expressOrders = filteredSchedule.filter(
+    (s) => s.deliveryType && s.deliveryType.toLowerCase().includes("express"),
+  ).length;
+  const deliveriesToday = filteredSchedule.filter(
+    (s) => s.type === "delivery",
+  ).length;
 
   return (
     <div className="flex flex-col gap-6">
@@ -365,35 +428,105 @@ export function PickupSchedule() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10"
-            onClick={() => navigateDate("prev")}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            className="gap-2 text-black hover:text-black min-w-[200px] justify-center"
-          >
-            <Calendar className="h-4 w-4" />
-            {formatDate(selectedDate)}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10"
-            onClick={() => navigateDate("next")}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 text-black hover:text-black min-w-[240px] justify-start text-left font-normal bg-white"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                <span className="font-medium">Export Order Data</span>
+                {date?.from && (
+                  <>
+                    <span className="mx-2 h-4 w-px bg-slate-300" />
+                    <span className="text-slate-600 font-normal">
+                      {date.to &&
+                      differenceInDays(date.to, date.from) === 7 &&
+                      isSameDay(date.to, new Date()) ? (
+                        "Last 7 Days"
+                      ) : date.to ? (
+                        <>
+                          {format(date.from, "LLL dd")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )}
+                    </span>
+                  </>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <div className="flex gap-2 p-3 border-b border-slate-100">
+                <div className="flex-1">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    From
+                  </span>
+                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                    {date?.from
+                      ? format(date.from, "MMM dd, yyyy")
+                      : "Select date"}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    To
+                  </span>
+                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                    {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
+                  </div>
+                </div>
+              </div>
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate as any}
+                numberOfMonths={2}
+              />
+              <div className="p-3 border-t">
+                <Button
+                  className="w-full bg-[#3E8940] hover:bg-[#3E8940]/90"
+                  onClick={handleExport}
+                  disabled={!date?.from || isExporting}
+                >
+                  {isExporting ? "Exporting..." : "Export Data"}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
+      {/* Data Period Label */}
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800">
+          {date?.from &&
+          date.to &&
+          differenceInDays(date.to, date.from) === 7 &&
+          isSameDay(date.to, new Date())
+            ? "Last 7 Days Overview"
+            : date?.from
+              ? `Overview: ${format(date.from, "MMM dd")} - ${date.to ? format(date.to, "MMM dd, yyyy") : format(date.from, "MMM dd, yyyy")}`
+              : "Overview"}
+        </h3>
+      </div>
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div
+          className={cn(
+            "bg-white p-4 rounded-xl border shadow-sm cursor-pointer transition-all hover:border-purple-200 hover:shadow-md",
+            activeFilter === "pickups"
+              ? "border-purple-500 ring-1 ring-purple-500 bg-purple-50/50"
+              : "border-slate-100",
+          )}
+          onClick={() =>
+            setActiveFilter(activeFilter === "pickups" ? "all" : "pickups")
+          }
+        >
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
               <Truck className="h-5 w-5 text-purple-600" />
@@ -408,7 +541,72 @@ export function PickupSchedule() {
             </div>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+
+        <div
+          className={cn(
+            "bg-white p-4 rounded-xl border shadow-sm cursor-pointer transition-all hover:border-blue-200 hover:shadow-md",
+            activeFilter === "deliveries"
+              ? "border-blue-500 ring-1 ring-blue-500 bg-blue-50/50"
+              : "border-slate-100",
+          )}
+          onClick={() =>
+            setActiveFilter(
+              activeFilter === "deliveries" ? "all" : "deliveries",
+            )
+          }
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <Package className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {deliveriesToday}
+              </p>
+              <p className="text-xs text-slate-500 font-medium">
+                Deliveries Today
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "bg-white p-4 rounded-xl border shadow-sm cursor-pointer transition-all hover:border-orange-200 hover:shadow-md",
+            activeFilter === "express"
+              ? "border-orange-500 ring-1 ring-orange-500 bg-orange-50/50"
+              : "border-slate-100",
+          )}
+          onClick={() =>
+            setActiveFilter(activeFilter === "express" ? "all" : "express")
+          }
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center">
+              <Timer className="h-5 w-5 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {expressOrders}
+              </p>
+              <p className="text-xs text-slate-500 font-medium">
+                Express Orders
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "bg-white p-4 rounded-xl border shadow-sm cursor-pointer transition-all hover:border-green-200 hover:shadow-md",
+            activeFilter === "completed"
+              ? "border-green-500 ring-1 ring-green-500 bg-green-50/50"
+              : "border-slate-100",
+          )}
+          onClick={() =>
+            setActiveFilter(activeFilter === "completed" ? "all" : "completed")
+          }
+        >
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -447,15 +645,35 @@ export function PickupSchedule() {
 
         {/* Table Body */}
         <div className="divide-y divide-slate-100">
-          {SCHEDULE_DATA.filter(
-            (s) =>
-              s.status === "pickup_scheduled" ||
-              s.status === "picked_up" ||
-              s.status === "in_workshop" ||
-              s.status === "ready_for_delivery" ||
-              s.status === "completed" ||
-              s.status === "not_scheduled",
-          )
+          {filteredSchedule
+            .filter((s) => {
+              // Apply active filter
+              if (activeFilter === "pickups") {
+                return s.type === "pickup";
+              }
+              if (activeFilter === "completed") {
+                return s.status === "completed";
+              }
+              if (activeFilter === "express") {
+                return (
+                  s.deliveryType &&
+                  s.deliveryType.toLowerCase().includes("express")
+                );
+              }
+              if (activeFilter === "deliveries") {
+                return s.type === "delivery";
+              }
+              return true;
+            })
+            .filter(
+              (s) =>
+                s.status === "pickup_scheduled" ||
+                s.status === "picked_up" ||
+                s.status === "in_workshop" ||
+                s.status === "ready_for_delivery" ||
+                s.status === "completed" ||
+                s.status === "not_scheduled",
+            )
             .sort((a, b) => {
               const getStatusWeight = (status: string) => {
                 if (status === "not_scheduled") return 0;

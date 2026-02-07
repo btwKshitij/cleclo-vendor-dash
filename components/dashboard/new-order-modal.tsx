@@ -133,7 +133,10 @@ export function NewOrderModal({ open, onOpenChange }: NewOrderModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-slate-50 border-0">
+      <DialogContent
+        className="sm:max-w-md p-0 overflow-hidden bg-slate-50 border-0"
+        showCloseButton={false}
+      >
         {isAccepted ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-4 bg-white h-full min-h-[400px]">
             <div className="h-20 w-20 bg-emerald-100 rounded-full flex items-center justify-center mb-2 animate-in zoom-in duration-300">

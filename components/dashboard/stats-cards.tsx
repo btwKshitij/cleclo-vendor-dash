@@ -1,10 +1,11 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { ClipboardList, Truck, Settings2, CheckCircle2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import { ClipboardList, Truck, Settings2, CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const stats = [
   {
     title: "New Assigned",
-    value: "12",
+    status: "Assigned",
     description: "+4 since yesterday",
     icon: ClipboardList,
     iconBg: "bg-emerald-100",
@@ -13,7 +14,7 @@ const stats = [
   },
   {
     title: "Pending Pickups",
-    value: "5",
+    status: "Pending Pickup",
     description: "Next pickup at 2:00 PM",
     icon: Truck,
     iconBg: "bg-blue-100",
@@ -22,7 +23,7 @@ const stats = [
   },
   {
     title: "In Processing",
-    value: "28",
+    status: "Processing",
     description: "15 washers active",
     icon: Settings2,
     iconBg: "bg-amber-100",
@@ -31,21 +32,50 @@ const stats = [
   },
   {
     title: "Ready for Delivery",
-    value: "8",
+    status: "Ready",
     description: "3 drivers notified",
     icon: CheckCircle2,
     iconBg: "bg-green-100",
     iconColor: "text-green-600",
     trend: "up",
   },
-]
+];
 
-export function StatsCards() {
+interface StatsCardsProps {
+  orders: any[];
+  selectedFilter: string | null;
+  onFilterChange: (status: string | null) => void;
+}
+
+export function StatsCards({
+  orders,
+  selectedFilter,
+  onFilterChange,
+}: StatsCardsProps) {
+  const getCount = (status: string) =>
+    orders.filter((o) => o.status === status).length;
+
+  const cardData = stats.map((stat) => ({
+    ...stat,
+    value: getCount(stat.status).toString(),
+  }));
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <Card key={stat.title}>
-          <CardContent>
+      {cardData.map((stat) => (
+        <Card
+          key={stat.title}
+          className={cn(
+            "cursor-pointer transition-all duration-200 hover:shadow-md border-2",
+            selectedFilter === stat.status
+              ? "border-[#3E8940] bg-emerald-50/10 shadow-md ring-1 ring-[#3E8940]"
+              : "border-transparent hover:border-emerald-100",
+          )}
+          onClick={() =>
+            onFilterChange(selectedFilter === stat.status ? null : stat.status)
+          }
+        >
+          <CardContent className="p-3">
             <div className="flex items-center justify-between space-y-0">
               <h3 className="text-sm font-bold text-[#3E8940]">{stat.title}</h3>
               <div className={`p-2 rounded-lg ${stat.iconBg}`}>
@@ -54,14 +84,16 @@ export function StatsCards() {
             </div>
             <div>
               <div className="text-3xl font-bold text-black">{stat.value}</div>
-              <p className="text-xs font-semibold mt-1 text-[#3E8940]">
-                {stat.trend === "up" && <span className=" font-medium select-none">↗ </span>}
+              {/* <p className="text-xs font-semibold mt-1 text-[#3E8940]">
+                {stat.trend === "up" && (
+                  <span className=" font-medium select-none">↗ </span>
+                )}
                 {stat.description}
-              </p>
+              </p> */}
             </div>
           </CardContent>
         </Card>
       ))}
     </div>
-  )
+  );
 }

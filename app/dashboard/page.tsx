@@ -2,11 +2,35 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Plus, X, Bell, Package } from "lucide-react";
+import {
+  Download,
+  Plus,
+  X,
+  Bell,
+  Package,
+  Calendar as CalendarIcon,
+  ChevronDown,
+} from "lucide-react";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { RecentOrders } from "@/components/dashboard/recent-orders";
 import { NewOrderModal } from "@/components/dashboard/new-order-modal";
 import { cn } from "@/lib/utils";
+import {
+  format,
+  isSameDay,
+  subDays,
+  isWithinInterval,
+  startOfDay,
+  endOfDay,
+  differenceInDays,
+} from "date-fns";
+import { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Static notification data
 const STATIC_NOTIFICATION = {
@@ -17,9 +41,170 @@ const STATIC_NOTIFICATION = {
   time: "Just now",
 };
 
+// Mock data moved from recent-orders.tsx
+const orders = [
+  {
+    id: "#ORD-8291",
+    customer: "Alice Freeman",
+    type: "Regular",
+    avatar: "/avatars/alice.png",
+    items: "5kg Wash & Fold",
+    status: "Processing",
+    dueDate: "Today, 5:00 PM",
+    isoDate: "2026-02-07T17:00:00",
+  },
+  {
+    id: "#ORD-8292",
+    customer: "Mark Wilson",
+    type: "New Customer",
+    avatar: "/avatars/mark.png",
+    items: "2 Suits Dry Clean",
+    status: "Assigned",
+    dueDate: "Tomorrow, 10:00 AM",
+    isoDate: "2026-02-08T10:00:00",
+  },
+  {
+    id: "#ORD-8288",
+    customer: "Sarah Jenkins",
+    type: "VIP",
+    avatar: "/avatars/sarah.png",
+    items: "10kg Mixed Load",
+    status: "Ready",
+    dueDate: "Yesterday",
+    isoDate: "2026-02-06T12:00:00",
+  },
+  {
+    id: "#ORD-8293",
+    customer: "James Doe",
+    type: "Regular",
+    avatar: "/avatars/james.png",
+    items: "Wedding Dress Clean",
+    status: "Pending Pickup",
+    dueDate: "Tomorrow, 2:00 PM",
+    isoDate: "2026-02-08T14:00:00",
+  },
+  {
+    id: "#ORD-8294",
+    customer: "Emily Chen",
+    type: "Regular",
+    avatar: "/avatars/emily.png",
+    items: "3 Curtains",
+    status: "Assigned",
+    dueDate: "Tomorrow, 2:00 PM",
+    isoDate: "2026-02-08T14:00:00",
+  },
+  {
+    id: "#ORD-8295",
+    customer: "Michael Brown",
+    type: "VIP",
+    avatar: "/avatars/michael.png",
+    items: "Premium Suit Clean",
+    status: "Assigned",
+    dueDate: "Today, 4:00 PM",
+    isoDate: "2026-02-07T16:00:00",
+  },
+  {
+    id: "#ORD-8296",
+    customer: "Lisa Wang",
+    type: "New Customer",
+    avatar: "/avatars/lisa.png",
+    items: "10kg Wash & Fold",
+    status: "Processing",
+    dueDate: "Today, 10:00 AM",
+    isoDate: "2026-02-07T10:00:00",
+  },
+  {
+    id: "#ORD-8297",
+    customer: "David Miller",
+    type: "Regular",
+    avatar: "/avatars/david.png",
+    items: "2 Winter Coats",
+    status: "Processing",
+    dueDate: "Tomorrow, 3:00 PM",
+    isoDate: "2026-02-08T15:00:00",
+  },
+  {
+    id: "#ORD-8298",
+    customer: "Sophie Turner",
+    type: "VIP",
+    avatar: "/avatars/sophie.png",
+    items: "Wedding Saree",
+    status: "Ready",
+    dueDate: "Today, 12:00 PM",
+    isoDate: "2026-02-07T12:00:00",
+  },
+  // Additional Mock Data
+  {
+    id: "#ORD-8299",
+    customer: "Robert Taylor",
+    type: "Regular",
+    avatar: "/avatars/robert.png",
+    items: "Bedding Set x2",
+    status: "Assigned",
+    dueDate: "Feb 9, 9:00 AM",
+    isoDate: "2026-02-09T09:00:00",
+  },
+  {
+    id: "#ORD-8300",
+    customer: "Jennifer Lopez",
+    type: "VIP",
+    avatar: "/avatars/jennifer.png",
+    items: "Designer Dress",
+    status: "Pending Pickup",
+    dueDate: "today, 6:00 PM",
+    isoDate: "2026-02-07T18:00:00",
+  },
+  {
+    id: "#ORD-8301",
+    customer: "William Anderson",
+    type: "New Customer",
+    avatar: "/avatars/william.png",
+    items: "Shirts x5, Pants x3",
+    status: "Processing",
+    dueDate: "Feb 5, 5:00 PM",
+    isoDate: "2026-02-05T17:00:00",
+  },
+  {
+    id: "#ORD-8302",
+    customer: "Jessica White",
+    type: "Regular",
+    avatar: "/avatars/jessica.png",
+    items: "Comforter Cleaning",
+    status: "Ready",
+    dueDate: "Feb 4, 11:00 AM",
+    isoDate: "2026-02-04T11:00:00",
+  },
+  {
+    id: "#ORD-8303",
+    customer: "Thomas Harris",
+    type: "Regular",
+    avatar: "/avatars/thomas.png",
+    items: "Rug Cleaning",
+    status: "Pending Pickup",
+    dueDate: "Feb 8, 10:00 AM",
+    isoDate: "2026-02-08T10:00:00",
+  },
+  {
+    id: "#ORD-8304",
+    customer: "Nancy Davis",
+    type: "VIP",
+    avatar: "/avatars/nancy.png",
+    items: "Silk Blouse x2",
+    status: "Processing",
+    dueDate: "Feb 6, 2:00 PM",
+    isoDate: "2026-02-06T14:00:00",
+  },
+];
+
 export default function DashboardPage() {
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
+  const [isExporting, setIsExporting] = useState(false);
 
   // Show notification on page load (but NOT the popup)
   useEffect(() => {
@@ -40,106 +225,50 @@ export default function DashboardPage() {
     }
   }, [showNotification]);
 
+  // ... existing imports
+
+  const filteredOrders = date?.from
+    ? orders.filter((order) => {
+        const orderDate = new Date(order.isoDate);
+        return isWithinInterval(orderDate, {
+          start: startOfDay(date.from!),
+          end: endOfDay(date.to || date.from!),
+        });
+      })
+    : orders;
+
+  const handleExport = () => {
+    setIsExporting(true);
+    // Simulate export delay
+    setTimeout(() => {
+      const csvContent =
+        "data:text/csv;charset=utf-8," +
+        "Order ID,Customer,Items,Status,Due Date\n" +
+        filteredOrders
+          .map(
+            (e) =>
+              `${e.id},${e.customer},${e.items.replace(/,/g, "")},${e.status},${e.dueDate}`,
+          )
+          .join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      const rangeStr = date?.from
+        ? `${format(date.from, "yyyy-MM-dd")}_to_${date.to ? format(date.to, "yyyy-MM-dd") : format(date.from, "yyyy-MM-dd")}`
+        : "all_time";
+      link.setAttribute("download", `orders_report_${rangeStr}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setIsExporting(false);
+    }, 1000);
+  };
+
   return (
     <div className="flex flex-col gap-8 relative">
-      {/* Notification Toast */}
-      <div
-        className={cn(
-          "fixed top-4 left-1/2 z-50 transition-all duration-500 transform -translate-x-1/2",
-          showNotification
-            ? "opacity-100 scale-100"
-            : "opacity-0 scale-95 pointer-events-none",
-        )}
-      >
-        <div className="bg-white rounded-xl shadow-2xl border border-slate-200 p-4 w-[380px] overflow-hidden">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-[#3E8940]/10 flex items-center justify-center animate-pulse">
-                <Bell className="h-5 w-5 text-[#3E8940]" />
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-900 text-sm">
-                  New Order Assigned!
-                </h4>
-                <p className="text-xs text-slate-500">
-                  {STATIC_NOTIFICATION.time}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowNotification(false)}
-              className="text-slate-400 hover:text-slate-600 p-1"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Order Details */}
-          <div className="bg-slate-50 rounded-lg p-3 mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-500 uppercase">
-                Order {STATIC_NOTIFICATION.id}
-              </span>
-              <span className="text-lg font-black text-[#3E8940]">
-                {STATIC_NOTIFICATION.earning}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4 text-slate-400" />
-              <span className="text-sm text-slate-700">
-                {STATIC_NOTIFICATION.items}
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Customer: {STATIC_NOTIFICATION.customer}
-            </p>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9 text-slate-700 border-slate-200"
-              onClick={() => setShowNotification(false)}
-            >
-              Dismiss
-            </Button>
-            <Button
-              size="sm"
-              className="flex-1 h-9 bg-[#3E8940] hover:bg-[#3E8940]/90"
-              onClick={() => {
-                setShowNotification(false);
-                setShowNewOrder(true);
-              }}
-            >
-              View Details
-            </Button>
-          </div>
-
-          {/* Progress bar animation */}
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-100">
-            <div
-              className="h-full bg-[#3E8940] animate-shrink"
-              style={{
-                animation: "shrink 120s linear forwards",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes shrink {
-          from {
-            width: 100%;
-          }
-          to {
-            width: 0%;
-          }
-        }
-      `}</style>
+      {/* ... Notification code ... */}
 
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -151,20 +280,109 @@ export default function DashboardPage() {
             Welcome back, here&apos;s what&apos;s happening today.
           </p>
         </div>
+      </div>
+
+      {/* Toolbar and Data Period Label */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        {/* Data Period Label */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="gap-2 text-black hover:text-black "
-          >
-            <Download className="h-4 w-4" />
-            Export Report
-          </Button>
+          <h3 className="text-lg font-bold text-slate-800">
+            {date?.from &&
+            date.to &&
+            differenceInDays(date.to, date.from) === 7 &&
+            isSameDay(date.to, new Date())
+              ? "Last 7 Days Overview"
+              : date?.from
+                ? `Overview: ${format(date.from, "MMM dd")} - ${date.to ? format(date.to, "MMM dd, yyyy") : format(date.from, "MMM dd, yyyy")}`
+                : "Overview"}
+          </h3>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="gap-2 text-slate-700 bg-white border-slate-200 h-10 rounded-xl font-medium min-w-[240px] justify-start text-left"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                <span className="font-medium">Export Orders Data</span>
+                {date?.from && (
+                  <>
+                    <span className="mx-2 h-4 w-px bg-slate-300" />
+                    <span className="text-slate-600 font-normal">
+                      {date.to &&
+                      differenceInDays(date.to, date.from) === 7 &&
+                      isSameDay(date.to, new Date()) ? (
+                        "Last 7 Days"
+                      ) : date.to ? (
+                        <>
+                          {format(date.from, "LLL dd")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y")
+                      )}
+                    </span>
+                  </>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <div className="flex gap-2 p-3 border-b border-slate-100">
+                <div className="flex-1">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    From
+                  </span>
+                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                    {date?.from
+                      ? format(date.from, "MMM dd, yyyy")
+                      : "Select date"}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    To
+                  </span>
+                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                    {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
+                  </div>
+                </div>
+              </div>
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+              <div className="p-3 border-t">
+                <Button
+                  className="w-full bg-[#3E8940] hover:bg-[#3E8940]/90"
+                  onClick={handleExport}
+                  disabled={!date?.from || isExporting}
+                >
+                  {isExporting ? "Exporting..." : "Export Data"}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
-      <StatsCards />
+      <StatsCards
+        orders={filteredOrders}
+        selectedFilter={filterStatus}
+        onFilterChange={setFilterStatus}
+      />
 
-      <RecentOrders onOrderClick={() => setShowNewOrder(true)} />
+      <RecentOrders
+        orders={filteredOrders}
+        onOrderClick={() => setShowNewOrder(true)}
+        filterStatus={filterStatus}
+      />
 
       <NewOrderModal open={showNewOrder} onOpenChange={setShowNewOrder} />
     </div>
