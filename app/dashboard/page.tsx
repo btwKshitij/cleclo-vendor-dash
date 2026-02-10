@@ -51,7 +51,7 @@ const orders = [
     items: "5kg Wash & Fold",
     status: "Processing",
     dueDate: "Today, 5:00 PM",
-    isoDate: "2026-02-07T17:00:00",
+    isoDate: "2026-02-10T17:00:00",
   },
   {
     id: "#ORD-8292",
@@ -61,7 +61,7 @@ const orders = [
     items: "2 Suits Dry Clean",
     status: "Assigned",
     dueDate: "Tomorrow, 10:00 AM",
-    isoDate: "2026-02-08T10:00:00",
+    isoDate: "2026-02-11T10:00:00",
   },
   {
     id: "#ORD-8288",
@@ -71,7 +71,7 @@ const orders = [
     items: "10kg Mixed Load",
     status: "Ready",
     dueDate: "Yesterday",
-    isoDate: "2026-02-06T12:00:00",
+    isoDate: "2026-02-09T12:00:00",
   },
   {
     id: "#ORD-8293",
@@ -81,7 +81,7 @@ const orders = [
     items: "Wedding Dress Clean",
     status: "Pending Pickup",
     dueDate: "Tomorrow, 2:00 PM",
-    isoDate: "2026-02-08T14:00:00",
+    isoDate: "2026-02-11T14:00:00",
   },
   {
     id: "#ORD-8294",
@@ -91,7 +91,7 @@ const orders = [
     items: "3 Curtains",
     status: "Assigned",
     dueDate: "Tomorrow, 2:00 PM",
-    isoDate: "2026-02-08T14:00:00",
+    isoDate: "2026-02-11T14:00:00",
   },
   {
     id: "#ORD-8295",
@@ -101,7 +101,7 @@ const orders = [
     items: "Premium Suit Clean",
     status: "Assigned",
     dueDate: "Today, 4:00 PM",
-    isoDate: "2026-02-07T16:00:00",
+    isoDate: "2026-02-10T16:00:00",
   },
   {
     id: "#ORD-8296",
@@ -111,7 +111,7 @@ const orders = [
     items: "10kg Wash & Fold",
     status: "Processing",
     dueDate: "Today, 10:00 AM",
-    isoDate: "2026-02-07T10:00:00",
+    isoDate: "2026-02-10T10:00:00",
   },
   {
     id: "#ORD-8297",
@@ -121,7 +121,7 @@ const orders = [
     items: "2 Winter Coats",
     status: "Processing",
     dueDate: "Tomorrow, 3:00 PM",
-    isoDate: "2026-02-08T15:00:00",
+    isoDate: "2026-02-11T15:00:00",
   },
   {
     id: "#ORD-8298",
@@ -131,7 +131,7 @@ const orders = [
     items: "Wedding Saree",
     status: "Ready",
     dueDate: "Today, 12:00 PM",
-    isoDate: "2026-02-07T12:00:00",
+    isoDate: "2026-02-10T12:00:00",
   },
   // Additional Mock Data
   {
@@ -152,7 +152,7 @@ const orders = [
     items: "Designer Dress",
     status: "Pending Pickup",
     dueDate: "today, 6:00 PM",
-    isoDate: "2026-02-07T18:00:00",
+    isoDate: "2026-02-10T18:00:00",
   },
   {
     id: "#ORD-8301",
@@ -220,7 +220,7 @@ export default function DashboardPage() {
     if (showNotification) {
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, 20000); // 2 minutes
+      }, 120000); // 2 minutes
       return () => clearTimeout(timer);
     }
   }, [showNotification]);
@@ -268,7 +268,82 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8 relative">
-      {/* ... Notification code ... */}
+      {/* Notification */}
+      {showNotification && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 duration-500 fade-in-0">
+          <div className="bg-white rounded-2xl shadow-2xl shadow-slate-200/50 border border-slate-100 p-5 w-[400px] flex items-start gap-4 ring-1 ring-slate-200/50 relative overflow-hidden">
+            {/* Progress Bar */}
+            <div className="absolute bottom-0 left-0 h-1 bg-[#3E8940]/10 w-full">
+              <div className="h-full bg-[#3E8940] animate-[shrink_120s_linear_forwards] origin-left" />
+            </div>
+            <div className="h-12 w-12 rounded-full bg-[#f0fdf4] border border-[#dcfce7] flex items-center justify-center shrink-0 shadow-sm">
+              <Bell className="h-6 w-6 text-[#16a34a]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-1">
+                <div>
+                  <h4 className="text-[15px] font-bold text-slate-900 leading-tight">
+                    New Order Received!
+                  </h4>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    {STATIC_NOTIFICATION.time}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 -mt-1 -mr-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full"
+                  onClick={() => setShowNotification(false)}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <p className="text-sm text-slate-600 mb-3 leading-relaxed">
+                Order{" "}
+                <span className="font-semibold text-slate-900">
+                  {STATIC_NOTIFICATION.id}
+                </span>{" "}
+                from{" "}
+                <span className="font-semibold text-slate-900">
+                  {STATIC_NOTIFICATION.customer}
+                </span>
+              </p>
+              <div className="flex items-center justify-between bg-slate-50/80 border border-slate-100 p-2.5 rounded-lg mb-4 group hover:border-[#3E8940]/20 transition-colors">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-white rounded-md shadow-sm border border-slate-100">
+                    <Package className="h-3.5 w-3.5 text-slate-500" />
+                  </div>
+                  <span className="text-sm font-semibold text-slate-700">
+                    {STATIC_NOTIFICATION.items}
+                  </span>
+                </div>
+                <span className="text-sm font-bold text-[#16a34a] bg-[#f0fdf4] px-2 py-0.5 rounded-md border border-[#dcfce7]">
+                  {STATIC_NOTIFICATION.earning}
+                </span>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1 bg-[#16a34a] hover:bg-[#15803d] text-white shadow-md shadow-green-200 h-9 font-semibold text-sm transition-all active:scale-[0.98]"
+                  onClick={() => {
+                    setShowNewOrder(true);
+                    setShowNotification(false);
+                  }}
+                >
+                  View Details
+                </Button>
+                <Button
+                  variant="outline"
+                  className="px-4 border-slate-200 hover:bg-slate-50 hover:text-slate-700 h-9 font-medium text-sm text-slate-600 transition-colors"
+                  onClick={() => setShowNotification(false)}
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

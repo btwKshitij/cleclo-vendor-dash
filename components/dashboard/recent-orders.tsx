@@ -1,4 +1,4 @@
-import { isBefore, startOfDay } from "date-fns";
+import { isBefore, subHours } from "date-fns";
 import Link from "next/link";
 import {
   Table,
@@ -97,7 +97,7 @@ export function RecentOrders({
                       {order.isoDate &&
                         isBefore(
                           new Date(order.isoDate),
-                          startOfDay(new Date()),
+                          subHours(new Date(), 24),
                         ) && <AlertTriangle className="h-4 w-4 text-red-500" />}
                       <span>{order.id}</span>
                     </div>
@@ -142,7 +142,7 @@ export function RecentOrders({
                     {order.isoDate &&
                     isBefore(
                       new Date(order.isoDate),
-                      startOfDay(new Date()),
+                      subHours(new Date(), 24),
                     ) ? (
                       <span className="text-red-500 font-bold">Overdue</span>
                     ) : null}
