@@ -42,7 +42,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-type OrderStatus = "new" | "accepted" | "processing" | "ready" | "completed";
+type OrderStatus =
+  | "New Orders"
+  | "Accepted Orders"
+  | "Under Processing"
+  | "Ready for Dispatch"
+  | "Completed Orders";
 type ServiceSpeed = "economy" | "fast" | "express";
 
 interface Order {
@@ -55,6 +60,7 @@ interface Order {
   pickupTime: string;
   deliveryTime: string;
   address: string;
+  locality: string;
   distance: string;
   earning: string;
   customerName: string;
@@ -65,14 +71,15 @@ const ORDERS: Order[] = [
   // New Orders
   {
     id: "ORD-4920",
-    status: "new",
+    status: "New Orders",
     serviceSpeed: "economy",
-    items: "Shirt x3, Jeans x2, Silk Scarf x1",
-    service: "Wash & Iron",
+    items: "3 Shirts • 2 Jeans • 1 Silk Scarf",
+    service: "Dry Cleaning",
     detergent: "Standard detergent",
-    pickupTime: "Today, 2:00 PM",
-    deliveryTime: "Tomorrow, 10:00 AM",
+    pickupTime: "Today at 2:00 PM",
+    deliveryTime: "Tomorrow at 10:00 AM",
     address: "123 Maple St, Downtown",
+    locality: "Punjabi Bagh",
     distance: "1.2 km",
     earning: "₹140",
     customerName: "John Smith",
@@ -80,14 +87,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4921",
-    status: "new",
+    status: "New Orders",
     serviceSpeed: "fast",
-    items: "Bedsheet x1, Pillow Case x4",
-    service: "Dry Clean",
+    items: "1 Bedsheet • 4 Pillow Cases",
+    service: "Dry Cleaning",
     detergent: "Delicate items",
-    pickupTime: "Today, 4:30 PM",
-    deliveryTime: "Tomorrow, 12:00 PM",
+    pickupTime: "Today at 4:30 PM",
+    deliveryTime: "Tomorrow at 12:00 PM",
     address: "456 Oak Ave, Uptown",
+    locality: "Uptown",
     distance: "3.5 km",
     earning: "₹220",
     customerName: "Sarah Johnson",
@@ -95,14 +103,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4925",
-    status: "new",
+    status: "New Orders",
     serviceSpeed: "express",
-    items: "Curtains x4, Sofa Covers x2",
+    items: "4 Curtains • 2 Sofa Covers",
     service: "Wash & Fold",
     detergent: "Heavy duty",
-    pickupTime: "Today, 5:00 PM",
-    deliveryTime: "Today, 9:00 PM",
+    pickupTime: "Today at 5:00 PM",
+    deliveryTime: "Today at 9:00 PM",
     address: "789 Pine Ln, Suburbs",
+    locality: "South Delhi",
     distance: "5.0 km",
     earning: "₹500",
     customerName: "Mike Chen",
@@ -111,14 +120,15 @@ const ORDERS: Order[] = [
   // Accepted Orders
   {
     id: "ORD-4918",
-    status: "accepted",
+    status: "Accepted Orders",
     serviceSpeed: "economy",
-    items: "Suit x1, Tie x2",
+    items: "1 Suit • 2 Ties",
     service: "Dry Clean",
     detergent: "Premium care",
-    pickupTime: "Today, 11:00 AM",
-    deliveryTime: "Wed, 2:00 PM",
+    pickupTime: "Today at 11:00 AM",
+    deliveryTime: "Wed at 2:00 PM",
     address: "321 Cedar Rd",
+    locality: "Janakpuri",
     distance: "2.1 km",
     earning: "₹350",
     customerName: "David Wilson",
@@ -126,14 +136,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4916",
-    status: "accepted",
+    status: "Accepted Orders",
     serviceSpeed: "fast",
-    items: "Dress x2, Blouse x3",
+    items: "2 Dresses • 3 Blouses",
     service: "Wash & Iron",
     detergent: "Gentle care",
-    pickupTime: "Today, 1:00 PM",
-    deliveryTime: "Tomorrow, 3:00 PM",
+    pickupTime: "Today at 1:00 PM",
+    deliveryTime: "Tomorrow at 3:00 PM",
     address: "555 Elm Street",
+    locality: "Rajouri Garden",
     distance: "1.8 km",
     earning: "₹280",
     customerName: "Emily Brown",
@@ -142,14 +153,15 @@ const ORDERS: Order[] = [
   // Processing Orders
   {
     id: "ORD-4912",
-    status: "processing",
+    status: "Under Processing",
     serviceSpeed: "economy",
-    items: "Jeans x5, T-Shirts x8",
+    items: "5 Jeans • 8 T-Shirts",
     service: "Wash & Fold",
     detergent: "Standard",
-    pickupTime: "Yesterday, 3:00 PM",
-    deliveryTime: "Tomorrow, 11:00 AM",
+    pickupTime: "Yesterday at 3:00 PM",
+    deliveryTime: "Tomorrow at 11:00 AM",
     address: "888 Birch Ave",
+    locality: "Pitampura",
     distance: "4.2 km",
     earning: "₹420",
     customerName: "Alex Turner",
@@ -157,14 +169,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4910",
-    status: "processing",
+    status: "Under Processing",
     serviceSpeed: "express",
-    items: "Wedding Dress x1",
+    items: "1 Wedding Dress",
     service: "Premium Dry Clean",
     detergent: "Delicate fabrics",
-    pickupTime: "Today, 9:00 AM",
-    deliveryTime: "Today, 6:00 PM",
+    pickupTime: "Today at 9:00 AM",
+    deliveryTime: "Today at 6:00 PM",
     address: "999 Willow Lane",
+    locality: "Gurgaon",
     distance: "2.5 km",
     earning: "₹800",
     customerName: "Lisa Anderson",
@@ -172,14 +185,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4908",
-    status: "processing",
+    status: "Under Processing",
     serviceSpeed: "fast",
-    items: "Uniforms x10",
+    items: "10 Uniforms",
     service: "Wash & Iron",
     detergent: "Commercial grade",
-    pickupTime: "Yesterday, 5:00 PM",
-    deliveryTime: "Tomorrow, 9:00 AM",
+    pickupTime: "Yesterday at 5:00 PM",
+    deliveryTime: "Tomorrow at 9:00 AM",
     address: "444 Oak Street",
+    locality: "Dwarka",
     distance: "3.0 km",
     earning: "₹600",
     customerName: "Corporate Client",
@@ -187,14 +201,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4905",
-    status: "processing",
+    status: "Under Processing",
     serviceSpeed: "economy",
-    items: "Blankets x2, Comforter x1",
+    items: "2 Blankets • 1 Comforter",
     service: "Heavy Wash",
     detergent: "Deep clean",
     pickupTime: "2 days ago",
-    deliveryTime: "Tomorrow, 4:00 PM",
+    deliveryTime: "Tomorrow at 4:00 PM",
     address: "222 Pine Road",
+    locality: "Rohini",
     distance: "5.5 km",
     earning: "₹380",
     customerName: "Robert Kim",
@@ -202,14 +217,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4902",
-    status: "processing",
+    status: "Under Processing",
     serviceSpeed: "economy",
-    items: "Shirts x6, Pants x4",
+    items: "6 Shirts • 4 Pants",
     service: "Wash & Iron",
     detergent: "Standard",
-    pickupTime: "Yesterday, 2:00 PM",
-    deliveryTime: "Tomorrow, 2:00 PM",
+    pickupTime: "Yesterday at 2:00 PM",
+    deliveryTime: "Tomorrow at 2:00 PM",
     address: "111 Maple Drive",
+    locality: "Paschim Vihar",
     distance: "1.9 km",
     earning: "₹320",
     customerName: "James Lee",
@@ -218,14 +234,15 @@ const ORDERS: Order[] = [
   // Ready Orders
   {
     id: "ORD-4900",
-    status: "ready",
+    status: "Ready for Dispatch",
     serviceSpeed: "fast",
-    items: "Jacket x2, Pants x2",
+    items: "2 Jackets • 2 Pants",
     service: "Dry Clean",
     detergent: "Premium",
     pickupTime: "2 days ago",
-    deliveryTime: "Today, 12:00 PM",
+    deliveryTime: "Today at 12:00 PM",
     address: "777 Cherry St",
+    locality: "Vikaspuri",
     distance: "2.8 km",
     earning: "₹450",
     customerName: "Tom Harris",
@@ -233,14 +250,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4898",
-    status: "ready",
+    status: "Ready for Dispatch",
     serviceSpeed: "economy",
-    items: "Curtains x6",
+    items: "6 Curtains",
     service: "Steam Clean",
     detergent: "Fabric refresh",
     pickupTime: "3 days ago",
-    deliveryTime: "Today, 3:00 PM",
+    deliveryTime: "Today at 3:00 PM",
     address: "333 Walnut Ave",
+    locality: "Moti Nagar",
     distance: "4.0 km",
     earning: "₹520",
     customerName: "Nancy White",
@@ -249,14 +267,15 @@ const ORDERS: Order[] = [
   // Completed Orders
   {
     id: "ORD-4895",
-    status: "completed",
+    status: "Completed Orders",
     serviceSpeed: "express",
-    items: "Party Dress x1, Accessories",
+    items: "1 Party Dress • Accessories",
     service: "Express Clean",
     detergent: "Delicate",
     pickupTime: "Yesterday",
-    deliveryTime: "Yesterday, 8:00 PM",
+    deliveryTime: "Yesterday at 8:00 PM",
     address: "666 Spruce Lane",
+    locality: "Kirti Nagar",
     distance: "3.2 km",
     earning: "₹650",
     customerName: "Jennifer Davis",
@@ -264,14 +283,15 @@ const ORDERS: Order[] = [
   },
   {
     id: "ORD-4890",
-    status: "completed",
+    status: "Completed Orders",
     serviceSpeed: "economy",
-    items: "Bedsheets x4, Towels x8",
+    items: "4 Bedsheets • 8 Towels",
     service: "Wash & Fold",
     detergent: "Fresh scent",
     pickupTime: "2 days ago",
-    deliveryTime: "Yesterday, 10:00 AM",
+    deliveryTime: "Yesterday at 10:00 AM",
     address: "123 Ash Road",
+    locality: "Tilak Nagar",
     distance: "2.0 km",
     earning: "₹300",
     customerName: "Chris Martin",
@@ -280,24 +300,24 @@ const ORDERS: Order[] = [
 ];
 
 const TABS: { label: string; value: OrderStatus }[] = [
-  { label: "New", value: "new" },
-  { label: "Accepted", value: "accepted" },
-  { label: "In Processing", value: "processing" },
-  { label: "Ready", value: "ready" },
-  { label: "Completed", value: "completed" },
+  { label: "New Orders", value: "New Orders" },
+  { label: "Accepted Orders", value: "Accepted Orders" },
+  { label: "Under Processing", value: "Under Processing" },
+  { label: "Ready for Dispatch", value: "Ready for Dispatch" },
+  { label: "Completed Orders", value: "Completed Orders" },
 ];
 
 const getStatusColor = (status: OrderStatus) => {
   switch (status) {
-    case "new":
+    case "New Orders":
       return "bg-orange-100 text-orange-700";
-    case "accepted":
+    case "Accepted Orders":
       return "bg-blue-100 text-blue-700";
-    case "processing":
+    case "Under Processing":
       return "bg-purple-100 text-purple-700";
-    case "ready":
+    case "Ready for Dispatch":
       return "bg-green-100 text-green-700";
-    case "completed":
+    case "Completed Orders":
       return "bg-slate-100 text-slate-700";
   }
 };
@@ -315,21 +335,21 @@ const getSpeedColor = (speed: ServiceSpeed) => {
 
 const getLeftBorderColor = (status: OrderStatus) => {
   switch (status) {
-    case "new":
+    case "New Orders":
       return "bg-orange-500";
-    case "accepted":
+    case "Accepted Orders":
       return "bg-blue-500";
-    case "processing":
+    case "Under Processing":
       return "bg-purple-500";
-    case "ready":
+    case "Ready for Dispatch":
       return "bg-[#3E8940]";
-    case "completed":
+    case "Completed Orders":
       return "bg-slate-400";
   }
 };
 
 export default function OrdersPage() {
-  const [activeTab, setActiveTab] = useState<OrderStatus>("new");
+  const [activeTab, setActiveTab] = useState<OrderStatus>("New Orders");
   const [serviceFilter, setServiceFilter] = useState<ServiceSpeed | "all">(
     "all",
   );
@@ -561,7 +581,7 @@ export default function OrdersPage() {
               No orders found
             </h3>
             <p className="text-slate-500">
-              {activeTab === "new"
+              {activeTab === "New Orders"
                 ? "No new orders at the moment. Check back soon!"
                 : `No ${activeTab} orders matching your filters.`}
             </p>
@@ -582,93 +602,65 @@ export default function OrdersPage() {
 
               <div className="flex flex-col md:flex-row gap-5 pl-4">
                 {/* Left Section: Info */}
-                <div className="flex-1 space-y-3">
-                  <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex-2 space-y-2">
+                  <div className="space-y-0.5">
                     <h3 className="text-lg font-bold text-slate-900 tracking-tight">
-                      {order.id}
+                      Order #{order.id.replace("ORD-", "")}
                     </h3>
-                    <Badge
-                      className={cn(
-                        "border-none uppercase text-[10px] font-bold tracking-wider rounded-md px-2 py-0.5",
-                        getStatusColor(order.status),
-                      )}
-                    >
-                      {order.status === "processing"
-                        ? "In Progress"
-                        : order.status}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-[10px] font-bold gap-1 rounded-md px-2 py-0.5 uppercase",
-                        getSpeedColor(order.serviceSpeed),
-                      )}
-                    >
-                      <Clock className="w-3 h-3" />
-                      {order.serviceSpeed}
-                    </Badge>
+                    <p className="text-sm font-semibold text-[#3E8940]">
+                      {order.status.split(" ")[0]} |{" "}
+                      {order.serviceSpeed === "economy"
+                        ? "Standard"
+                        : order.serviceSpeed.charAt(0).toUpperCase() +
+                          order.serviceSpeed.slice(1)}
+                    </p>
                   </div>
 
-                  <p className="text-sm font-medium text-slate-700">
-                    {order.items}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Customer: {order.customerName}
-                  </p>
+                  <div className="space-y-1 mt-3">
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">Items:</span>{" "}
+                      {order.items}
+                    </p>
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">
+                        Customer:
+                      </span>{" "}
+                      {order.customerName}
+                    </p>
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">Service:</span>{" "}
+                      {order.service}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Right Section: Details & Status */}
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Detail Column 1 */}
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
-                        <Shirt className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">
-                          {order.service}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {order.detergent}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-[#3E8940]/10 text-[#3E8940] rounded-lg shrink-0">
-                        <Truck className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">
-                          Pickup: {order.pickupTime}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          Delivery: {order.deliveryTime}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-slate-100 text-slate-600 rounded-lg shrink-0">
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-slate-900">
-                          {order.address}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {order.distance} away
-                        </p>
-                      </div>
-                    </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">Pickup:</span>{" "}
+                      {order.pickupTime}
+                    </p>
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">
+                        Delivery:
+                      </span>{" "}
+                      {order.deliveryTime}
+                    </p>
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="text-slate-500 font-bold">
+                        Location:
+                      </span>{" "}
+                      {order.locality} ({order.distance} away)
+                    </p>
                   </div>
 
                   {/* Detail Column 2 (Earning & Actions) */}
                   <div className="flex flex-col justify-between items-end text-right h-full py-1">
                     <div>
                       <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">
-                        Your Earning
+                        Estimated Earnings
                       </p>
                       <p className="text-2xl font-black text-[#3E8940]">
                         {order.earning}
@@ -676,41 +668,41 @@ export default function OrdersPage() {
                     </div>
 
                     <div className="flex flex-col gap-2 items-end">
-                      {order.status === "new" && (
+                      {order.status === "New Orders" && (
                         <Button
                           size="sm"
-                          className="bg-[#3E8940] hover:bg-[#3E8940]/90 h-8 text-xs"
+                          className="bg-[#3E8940] hover:bg-[#3E8940]/90 h-8 text-xs font-bold px-4"
                         >
                           Accept Order
                         </Button>
                       )}
-                      {order.status === "accepted" && (
+                      {order.status === "Accepted Orders" && (
                         <Button
                           size="sm"
-                          className="bg-purple-600 hover:bg-purple-700 h-8 text-xs"
+                          className="bg-purple-600 hover:bg-purple-700 h-8 text-xs font-bold px-4"
                         >
                           Start Processing
                         </Button>
                       )}
-                      {order.status === "processing" && (
+                      {order.status === "Under Processing" && (
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700 h-8 text-xs"
+                          className="bg-green-600 hover:bg-green-700 h-8 text-xs font-bold px-4"
                         >
                           Mark Ready
                         </Button>
                       )}
-                      {order.status === "ready" && (
+                      {order.status === "Ready for Dispatch" && (
                         <Button
                           size="sm"
-                          className="bg-blue-600 hover:bg-blue-700 h-8 text-xs"
+                          className="bg-blue-600 hover:bg-blue-700 h-8 text-xs font-bold px-4"
                         >
                           Complete Delivery
                         </Button>
                       )}
-                      {order.status === "completed" && (
-                        <Badge className="bg-green-100 text-green-700 border-none gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
+                      {order.status === "Completed Orders" && (
+                        <Badge className="bg-green-100 text-green-700 border-none gap-1 py-1 px-3">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
                           Completed
                         </Badge>
                       )}

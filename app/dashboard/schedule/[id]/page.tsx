@@ -20,6 +20,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 // Mock data - in real app this would come from API
 const SCHEDULE_DATA = [
@@ -237,6 +245,16 @@ export default function ScheduleDetailPage() {
     [key: string]: boolean;
   }>({});
 
+  const [disputedItems, setDisputedItems] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [verificationData, setVerificationData] = useState<{
+    verifiedAt: string;
+    verifiedBy: string;
+  } | null>(null);
+
   if (!schedule) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -265,13 +283,42 @@ export default function ScheduleDetailPage() {
     }));
   };
 
-  // Verify only the selected items
-  const handleVerifySelectedItems = () => {
+  const handleToggleDispute = (e: React.MouseEvent, itemId: string) => {
+    e.stopPropagation();
+    if (vendorVerifiedItems[itemId]) return;
+    setDisputedItems((prev) => ({
+      ...prev,
+      [itemId]: !prev[itemId],
+    }));
+  };
+
+  // Final verification after model confirmation
+  const executeVerification = () => {
     setVendorVerifiedItems((prev) => ({
       ...prev,
       ...selectedItems,
     }));
+    setVerificationData({
+      verifiedAt:
+        new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }) +
+        " | " +
+        new Date().toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      verifiedBy: "Luxe Laundry Hub", // Mock vendor name
+    });
     setSelectedItems({}); // Clear selection after verification
+    setShowConfirmModal(false);
+  };
+
+  const handleVerifySelectedItems = () => {
+    setShowConfirmModal(true);
   };
 
   // Verify all remaining items at once
@@ -308,27 +355,36 @@ export default function ScheduleDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-slate-900">
-                {schedule.orderId}
+                Order {schedule.orderId}
               </h1>
-              <Badge
-                className={cn(
-                  "gap-1 px-2.5 py-1 text-xs font-semibold border",
-                  statusConfig.className,
-                )}
-              >
-                <StatusIcon className="h-3 w-3" />
-                {statusConfig.label}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-500">
+                  Status:
+                </span>
+                <Badge
+                  className={cn(
+                    "gap-1 px-2.5 py-1 text-xs font-semibold border",
+                    statusConfig.className,
+                  )}
+                >
+                  <StatusIcon className="h-3 w-3" />
+                  {schedule.status === "not_scheduled"
+                    ? "Pickup Not Scheduled"
+                    : statusConfig.label}
+                </Badge>
+              </div>
             </div>
-            <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                {schedule.date}
-              </span>
-              <span className="flex items-center gap-1">
-                <Package className="h-3.5 w-3.5" />
-                {schedule.items} items
-              </span>
+            <div className="flex flex-col mt-1 space-y-1">
+              <div className="flex items-center gap-4 text-sm text-slate-500">
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {schedule.date}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Package className="h-3.5 w-3.5" />
+                  {totalItems} Items • Placed on {schedule.date}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -336,59 +392,33 @@ export default function ScheduleDetailPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-              <Package className="h-5 w-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{totalItems}</p>
-              <p className="text-xs text-slate-500 font-medium">Total Items</p>
-            </div>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
+          <p className="text-2xl font-bold text-slate-900">{totalItems}</p>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Total Items in Order
+          </p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Truck className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">
-                {deliveryVerifiedCount}/{totalItems}
-              </p>
-              <p className="text-xs text-slate-500 font-medium">
-                Delivery Verified
-              </p>
-            </div>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
+          <p className="text-2xl font-bold text-slate-900">
+            {deliveryVerifiedCount}/{totalItems}
+          </p>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Pickup Verification
+          </p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">
-                {vendorVerifiedCount}/{totalItems}
-              </p>
-              <p className="text-xs text-slate-500 font-medium">
-                Vendor Verified
-              </p>
-            </div>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
+          <p className="text-2xl font-bold text-slate-900">
+            {vendorVerifiedCount}/{totalItems}
+          </p>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Vendor Intake Verification
+          </p>
         </div>
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-              <Star className="h-5 w-5 text-amber-600 fill-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">
-                {schedule.rating}
-              </p>
-              <p className="text-xs text-slate-500 font-medium">Rating</p>
-            </div>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-4 text-center">
+          <p className="text-2xl font-bold text-slate-900">{schedule.rating}</p>
+          <p className="text-xs text-slate-500 font-medium mt-1">
+            Customer Rating
+          </p>
         </div>
       </div>
 
@@ -417,9 +447,8 @@ export default function ScheduleDetailPage() {
                       Delivery Partner Verification
                     </h2>
                     <p className="text-xs text-slate-500">
-                      {isPickupDone
-                        ? "Items verified at pickup from customer"
-                        : "Waiting for pickup from customer"}
+                      Items will be verified by the delivery partner at the time
+                      of pickup.
                     </p>
                   </div>
                 </div>
@@ -436,9 +465,9 @@ export default function ScheduleDetailPage() {
             <div className="p-4">
               {!isPickupDone && (
                 <div className="mb-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
-                  <p className="text-xs text-amber-700 flex items-center gap-2">
+                  <p className="text-xs text-amber-700 flex items-center gap-2 font-medium">
                     <Clock className="h-4 w-4" />
-                    Items will be verified when delivery partner picks them up
+                    Verification will begin once the pickup is completed.
                   </p>
                 </div>
               )}
@@ -498,10 +527,11 @@ export default function ScheduleDetailPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-slate-900">
-                      Vendor Verification
+                      Vendor Intake Verification
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Items verified upon receiving at vendor
+                      Select each item after physically inspecting it at the
+                      store.
                     </p>
                   </div>
                 </div>
@@ -511,9 +541,13 @@ export default function ScheduleDetailPage() {
               </div>
             </div>
             <div className="p-4">
-              <p className="text-xs text-slate-500 mb-3">
-                Click items to select, then verify with the button below
-              </p>
+              <div className="mb-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                <p className="text-xs text-emerald-700 flex items-center gap-2 font-medium">
+                  <AlertCircle className="h-4 w-4" />
+                  Confirm item condition, quantity and visible damage before
+                  proceeding.
+                </p>
+              </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {flattenedItems.map((item, index) => (
                   <div
@@ -546,9 +580,26 @@ export default function ScheduleDetailPage() {
                         />
                       </div>
                     )}
-                    <p className="font-medium text-xs text-slate-900 text-center">
+                    <p className="font-medium text-[11px] text-slate-900 text-center leading-tight">
                       {item.name}
                     </p>
+
+                    {/* Dispute Option */}
+                    {!vendorVerifiedItems[item.uniqueId] && (
+                      <button
+                        onClick={(e) => handleToggleDispute(e, item.uniqueId)}
+                        className={cn(
+                          "mt-2 text-[10px] font-bold px-2 py-0.5 rounded-full transition-colors",
+                          disputedItems[item.uniqueId]
+                            ? "bg-red-500 text-white"
+                            : "bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600",
+                        )}
+                      >
+                        {disputedItems[item.uniqueId]
+                          ? "Disputed"
+                          : "Dispute Image"}
+                      </button>
+                    )}
                     {vendorVerifiedItems[item.uniqueId] && (
                       <div className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-green-500 flex items-center justify-center shadow-md">
                         <CheckCircle2 className="h-3 w-3 text-white" />
@@ -570,11 +621,11 @@ export default function ScheduleDetailPage() {
                   {/* Verify Selected Button - only show if items are selected */}
                   {selectedCount > 0 && (
                     <Button
-                      className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-base font-semibold"
+                      className="w-full bg-[#3E8940] hover:bg-[#3E8940]/90 h-12 text-base font-bold shadow-lg shadow-emerald-900/10"
                       onClick={handleVerifySelectedItems}
                     >
                       <CheckCircle2 className="h-5 w-5 mr-2" />
-                      Verify Selected ({selectedCount} items)
+                      Confirm & Verify Selected Items
                     </Button>
                   )}
 
@@ -595,13 +646,24 @@ export default function ScheduleDetailPage() {
                 </div>
               )}
 
-              {vendorVerifiedCount === totalItems && (
-                <div className="mt-4 pt-4 border-t border-slate-100">
+              {vendorVerifiedCount === totalItems && verificationData && (
+                <div className="mt-4 pt-4 border-t border-slate-100 space-y-4">
                   <div className="flex items-center justify-center gap-2 p-3 bg-green-50 rounded-xl border border-green-200">
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
                     <span className="text-sm font-semibold text-green-700">
                       All items verified successfully!
                     </span>
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">
+                      Verified By:{" "}
+                      <span className="text-slate-900 font-bold">
+                        {verificationData.verifiedBy}
+                      </span>
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium">
+                      Verified at: {verificationData.verifiedAt}
+                    </p>
                   </div>
                 </div>
               )}
@@ -612,7 +674,7 @@ export default function ScheduleDetailPage() {
 
       {/* Info Cards Row */}
       <div className="grid md:grid-cols-2 gap-4">
-        {/* Special Note Card */}
+        {/* Special Handling Note Card */}
         {schedule.note && (
           <div className="relative overflow-hidden bg-linear-to-br from-amber-50 to-orange-50 border border-amber-200/50 rounded-2xl p-5 shadow-sm">
             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-100/50 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -622,10 +684,13 @@ export default function ScheduleDetailPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-amber-900 text-base">
-                  Special Note
+                  Special Handling Note
                 </h3>
-                <p className="text-amber-700 text-sm mt-1 leading-relaxed">
-                  {schedule.note}
+                <p className="text-amber-700 text-sm mt-1 leading-relaxed font-medium">
+                  Colour bleed risk identified for Red Dress.
+                </p>
+                <p className="text-amber-600 text-[11px] mt-1 font-bold uppercase tracking-wider">
+                  Handle separately during processing.
                 </p>
               </div>
             </div>
@@ -698,11 +763,11 @@ export default function ScheduleDetailPage() {
                       Order Placed
                     </h4>
                     <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                      {schedule.date}, 10:30 AM
+                      Placed on Jan 21, 2026 at 10:30 AM
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 mt-1">
-                    Customer placed the order for {totalItems} items
+                    Customer confirmed order ({totalItems} items)
                   </p>
                 </div>
               </div>
@@ -736,19 +801,19 @@ export default function ScheduleDetailPage() {
                     <div className="flex-1 pt-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-semibold text-amber-700">
-                          Waiting for Driver Assignment
+                          Awaiting Driver Assignment
                         </h4>
                         <span className="text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded-full font-medium">
-                          Pending
+                          Assignment Pending
                         </span>
                       </div>
                       <p className="text-sm text-amber-600 mt-1">
-                        No delivery partner assigned yet
+                        No delivery partner has been assigned.
                       </p>
                       <div className="mt-2 p-3 bg-amber-50 rounded-xl border border-amber-100">
                         <p className="text-xs text-amber-700">
-                          ⏳ Waiting for a delivery partner to accept this
-                          pickup
+                          ⏳ Waiting for a delivery partner to accept the pickup
+                          request.
                         </p>
                       </div>
                     </div>
@@ -822,7 +887,7 @@ export default function ScheduleDetailPage() {
                         Pickup from Customer
                       </h4>
                       <p className="text-sm text-slate-400 mt-1">
-                        Waiting for driver assignment
+                        Pickup will begin once a driver is assigned.
                       </p>
                     </div>
                   </>
@@ -913,7 +978,8 @@ export default function ScheduleDetailPage() {
                         In Transit to Vendor
                       </h4>
                       <p className="text-sm text-slate-400 mt-1">
-                        Pending pickup
+                        Items have been picked up and are en-route to the vendor
+                        location.
                       </p>
                     </div>
                   </>
@@ -985,7 +1051,8 @@ export default function ScheduleDetailPage() {
                         Received at Vendor
                       </h4>
                       <p className="text-sm text-slate-400 mt-1">
-                        Waiting for delivery
+                        Items have arrived at the vendor location and are
+                        awaiting processing.
                       </p>
                     </div>
                   </>
@@ -1023,7 +1090,7 @@ export default function ScheduleDetailPage() {
                         Processing
                       </h4>
                       <p className="text-sm text-slate-400 mt-1">
-                        Laundry service will begin after receiving
+                        Garments are currently under cleaning and quality check.
                       </p>
                     </div>
                   </>
@@ -1045,7 +1112,7 @@ export default function ScheduleDetailPage() {
                     </span>
                   </div>
                   <p className="text-sm text-slate-400 mt-1">
-                    Items cleaned and ready for pickup
+                    Cleaning completed. Awaiting delivery partner assignment.
                   </p>
                 </div>
               </div>
@@ -1058,14 +1125,14 @@ export default function ScheduleDetailPage() {
                 <div className="flex-1 pt-1">
                   <div className="flex items-center justify-between">
                     <h4 className="font-semibold text-slate-400">
-                      Delivery Driver Assigned
+                      Delivery Partner Assigned
                     </h4>
                     <span className="text-xs text-slate-400">
                       Tomorrow, 10:30 AM
                     </span>
                   </div>
                   <p className="text-sm text-slate-400 mt-1">
-                    Waiting for driver assignment
+                    Driver has been assigned for delivery pickup.
                   </p>
                 </div>
               </div>
@@ -1085,7 +1152,8 @@ export default function ScheduleDetailPage() {
                     </span>
                   </div>
                   <p className="text-sm text-slate-400 mt-1">
-                    Driver will pickup items for delivery
+                    Items collected by delivery partner and in transit to
+                    customer.
                   </p>
                 </div>
               </div>
@@ -1137,20 +1205,53 @@ export default function ScheduleDetailPage() {
                 </div>
                 <div className="flex-1 pt-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-slate-400">
-                      Delivered to Customer
-                    </h4>
-                    <span className="text-xs text-slate-400">
-                      Tomorrow, 12:00 PM
+                    <h4 className="font-semibold text-slate-400">Delivered</h4>
+                    <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                      Delivered on Jan 22, 2026 at 11:00 AM
                     </span>
                   </div>
-                  <p className="text-sm text-slate-400 mt-1">Order completed</p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Order successfully delivered to customer.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              Damage Declaration
+            </DialogTitle>
+            <DialogDescription className="pt-4 text-slate-600 font-medium leading-relaxed">
+              Confirm that all selected items have been inspected and match the
+              pickup details.
+              <br />
+              <br />
+              <span className="text-red-500 font-bold">Important:</span> Any
+              discrepancies must be reported before verification.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6 gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Back to Inspection
+            </Button>
+            <Button
+              className="bg-[#3E8940] hover:bg-[#3E8940]/90"
+              onClick={executeVerification}
+            >
+              Confirm & Verify
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

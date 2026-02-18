@@ -27,7 +27,7 @@ export default function HowItWorks() {
       icon: Store,
       title: "Configure Outlets & Services",
       description:
-        "Set up your outlets, choose the services you offer (Dry Clean, Washing, Ironing, Etc.), defined pricing and configure service areas- all from a simple dashboard.",
+        "Set up your outlets, choose the services you offer (Dry Clean, Washing, Ironing, etc), defined pricing and configure service areas all from a simple dashboard.",
       gradient: "from-purple-500 to-pink-500",
       color: "text-purple-500",
     },
@@ -108,7 +108,7 @@ export default function HowItWorks() {
             How It <span className="gradient-text">Works</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A streamlined process to onboard, operate and scale on Cleclo
+            A streamlined process to onboard, operate and scale on Cleclo.
           </p>
         </motion.div>
 
@@ -134,7 +134,7 @@ export default function HowItWorks() {
               <div className="text-sm">
                 <p className="font-bold text-foreground">Cleclo Intelligence</p>
                 <p className="text-muted-foreground">
-                  Handles order routing & notifications automatically
+                  Handles order routing & notifications automatically.
                 </p>
               </div>
             </motion.div>

@@ -18,7 +18,8 @@ const STEPS = [
   {
     id: 1,
     title: "Account Details",
-    description: "Contact & login information",
+    description:
+      "Provide your primary business and login information to set up your vendor account.",
   },
   {
     id: 2,
@@ -27,13 +28,15 @@ const STEPS = [
   },
   {
     id: 3,
-    title: "Payment Info",
-    description: "Capacity & bank account details",
+    title: "Payment & Capacity Details",
+    description:
+      "Provide your processing capacity and bank details for order allocation and weekly payouts.",
   },
   {
     id: 4,
-    title: "Documents",
-    description: "Proof of registration & identity",
+    title: "Verification Documents",
+    description:
+      "Upload required identity and business registration documents for account verification.",
   },
   { id: 5, title: "Confirm", description: "Review & submit application" },
 ];
@@ -237,7 +240,7 @@ export function VendorSignupForm() {
                     </label>
                     <input
                       type="text"
-                      placeholder="Enter your business name"
+                      placeholder="Registered Business Name (As per Legal Documents)"
                       className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                     />
                   </div>
@@ -247,13 +250,13 @@ export function VendorSignupForm() {
                     </label>
                     <input
                       type="text"
-                      placeholder="Your full name"
+                      placeholder="Full Name of Authorized Signatory"
                       className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                     />
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   <div className="group">
                     <label className="block text-sm font-semibold text-slate-900 mb-3">
                       Mobile Number
@@ -266,12 +269,12 @@ export function VendorSignupForm() {
                           setMobileNumber(e.target.value);
                           if (isVerified) setIsVerified(false);
                         }}
-                        placeholder="+91 XXXXX XXXXX"
+                        placeholder="OTP Verification Required for Account Activation"
                         className={`w-full px-5 py-3 rounded-xl border-2 ${
                           isVerified
                             ? "border-emerald-500 bg-emerald-50/10"
                             : "border-slate-200 bg-slate-50"
-                        } text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10`}
+                        } text-slate-900 placeholder-slate-400 placeholder:text-sm font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10`}
                       />
                       {!isVerified ? (
                         <button
@@ -280,7 +283,7 @@ export function VendorSignupForm() {
                           disabled={!mobileNumber || mobileNumber.length < 10}
                           className="px-6 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap transition-all duration-200 text-sm shadow-lg shadow-slate-900/10"
                         >
-                          Verify
+                          Verify Number
                         </button>
                       ) : (
                         <div className="px-6 py-3 bg-emerald-100 text-emerald-700 font-semibold rounded-xl flex items-center gap-2 border-2 border-emerald-200 whitespace-nowrap">
@@ -296,8 +299,8 @@ export function VendorSignupForm() {
                     </label>
                     <input
                       type="email"
-                      placeholder="your@email.com"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                      placeholder="Used for Login Access, Payment Notifications and Operational Updates."
+                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 placeholder:text-sm font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                     />
                     <p className="text-sm text-slate-600 font-medium mt-2 ml-2">
                       Used for account access and important updates
@@ -305,15 +308,15 @@ export function VendorSignupForm() {
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   <div className="group">
                     <label className="block text-sm font-semibold text-slate-900 mb-3">
                       Password
                     </label>
                     <input
                       type="password"
-                      placeholder="Minimum 8 Characters (Include Letters & Numbers)"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                      placeholder="Minimum 8 characters, including at least one letter and one number."
+                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 placeholder:text-sm font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                     />
                   </div>
                   <div className="group">
@@ -323,7 +326,7 @@ export function VendorSignupForm() {
                     <input
                       type="password"
                       placeholder="Re-enter password"
-                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                      className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 placeholder:text-sm font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                     />
                   </div>
                 </div>
@@ -366,9 +369,11 @@ export function VendorSignupForm() {
                       Business Type
                     </label>
                     <select className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10">
-                      <option>Proprietorship</option>
-                      <option>Partnership</option>
-                      <option>Private Limited</option>
+                      <option>Sole Proprietorship</option>
+                      <option>Partnership Firm</option>
+                      <option>Limited Liability Partnership (LLP)</option>
+                      <option>Private Limited Company</option>
+                      <option>One Person Company (OPC)</option>
                     </select>
                   </div>
                 </div>
@@ -608,16 +613,15 @@ export function VendorSignupForm() {
               <div className="space-y-7">
                 <div className="group">
                   <label className="block text-sm font-semibold text-slate-900 mb-3">
-                    Daily Capacity
+                    Daily Processing Capacity
                   </label>
                   <input
                     type="number"
-                    placeholder="Enter Capacity in Units/Day"
+                    placeholder="Enter maximum garments/items you can process per day."
                     className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                   />
                   <p className="text-sm mt-4 text-slate-500 ">
-                    Used to assign orders within your processing limits. You can
-                    update this anytime.
+                    Used to allocate orders based on your operational limits.
                   </p>
                 </div>
 
@@ -626,9 +630,9 @@ export function VendorSignupForm() {
                     Bank Account Details
                   </h3>
                   <div className="flex items-center gap-2 mb-6 text-slate-500">
-                    <Lock className="w-4 h-4" />
                     <p className="text-sm">
-                      Your bank details are encrypted and used only for payouts.
+                      🔒 Your bank details are securely encrypted and used only
+                      for payout processing.
                     </p>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -638,7 +642,7 @@ export function VendorSignupForm() {
                       </label>
                       <input
                         type="text"
-                        placeholder="As per bank records"
+                        placeholder="Enter Exactly as per Bank Records"
                         className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                       />
                     </div>
@@ -661,7 +665,17 @@ export function VendorSignupForm() {
                       </label>
                       <input
                         type="text"
-                        placeholder="9-18 digit number"
+                        placeholder="Enter Bank Account Number (no spaces)"
+                        className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
+                      />
+                    </div>
+                    <div className="group">
+                      <label className="block text-sm font-semibold text-slate-900 mb-3">
+                        Confirm Account Number
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Re-enter Bank Account Number"
                         className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                       />
                     </div>
@@ -671,7 +685,7 @@ export function VendorSignupForm() {
                       </label>
                       <input
                         type="text"
-                        placeholder="11-character code"
+                        placeholder="11-character IFSC Code"
                         className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                       />
                     </div>
@@ -682,11 +696,9 @@ export function VendorSignupForm() {
                       Payouts
                     </h4>
                     <ul className="space-y-2 text-sm text-slate-600 ml-6 list-disc marker:text-emerald-500">
-                      <li>Payments are settled weekly</li>
-                      <li>
-                        Amounts are credited directly to your bank account
-                      </li>
-                      <li>Detailed earnings are available in your dashboard</li>
+                      <li>Processed every Friday.</li>
+                      <li>Covers completed orders.</li>
+                      <li>Credited within 1-2 working days.</li>
                     </ul>
                   </div>
                 </div>
@@ -694,50 +706,67 @@ export function VendorSignupForm() {
             )}
 
             {currentStep === 4 && (
-              <div className="grid md:grid-cols-3 gap-6">
-                {[
-                  { title: "Aadhaar Card", desc: "Front and Back Copy" },
-                  { title: "PAN Card", desc: "Official PAN Card Copy" },
-                  { title: "Passport", desc: "First and Last Page" },
-                  {
-                    title: "GST Certificate",
-                    desc: "Official GST Registration",
-                  },
-                  {
-                    title: "Business Certificate",
-                    desc: "License / Registration",
-                  },
-                ].map((doc, index) => (
-                  <div
-                    key={index}
-                    className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 group"
-                  >
-                    <div className="w-12 h-12 mx-auto mb-3 bg-slate-100 group-hover:bg-emerald-100 rounded-full flex items-center justify-center transition-colors duration-200">
-                      <svg
-                        className="w-6 h-6 text-slate-600 group-hover:text-emerald-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
+              <div className="space-y-8">
+                <div className="grid md:grid-cols-3 gap-6">
+                  {[
+                    {
+                      title: "Aadhaar Card (Authorized Signatory)",
+                      desc: "Upload clear front and back copies.",
+                    },
+                    {
+                      title: "PAN Card (Business PAN)",
+                      desc: "Upload a clear scanned copy.",
+                    },
+                    { title: "Passport", desc: "First and Last Page" },
+                    {
+                      title: "GST Registration Certificate (If Applicable)",
+                      desc: "Required only if GST registered.",
+                    },
+                    {
+                      title: "Business Registration Certificate",
+                      desc: "(Udyam/Shop Act/Partnership Deed/Incorporation Certificate)",
+                    },
+                  ].map((doc, index) => (
+                    <div
+                      key={index}
+                      className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 group"
+                    >
+                      <div className="w-12 h-12 mx-auto mb-3 bg-slate-100 group-hover:bg-emerald-100 rounded-full flex items-center justify-center transition-colors duration-200">
+                        <svg
+                          className="w-6 h-6 text-slate-600 group-hover:text-emerald-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </div>
+                      <h4 className="font-bold text-slate-900 text-sm">
+                        {doc.title}
+                      </h4>
+                      <p className="text-xs text-slate-600 mt-1 mb-3">
+                        {doc.desc}
+                      </p>
+                      <button className="px-4 py-2 bg-emerald-500 text-white text-xs font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
+                        Choose File
+                      </button>
                     </div>
-                    <h4 className="font-bold text-slate-900 text-sm">
-                      {doc.title}
-                    </h4>
-                    <p className="text-xs text-slate-600 mt-1 mb-3">
-                      {doc.desc}
-                    </p>
-                    <button className="px-4 py-2 bg-emerald-500 text-white text-xs font-semibold rounded-lg hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40">
-                      Choose File
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-2">
+                  <p className="text-sm font-semibold text-slate-900">
+                    Accepted Formats: PDF, JPG, PNG • Max 5MB per file
+                  </p>
+                  <p className="text-sm text-slate-600 font-medium">
+                    Verification typically takes 24–48 business hours.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -830,7 +859,7 @@ export function VendorSignupForm() {
               disabled={currentStep === 1}
               className="px-6 sm:px-8 py-3.5 border-2 border-slate-300 text-slate-900 font-semibold rounded-xl hover:bg-slate-100 hover:border-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 text-base"
             >
-              Previous
+              Back
             </button>
             <button
               onClick={handleNext}
@@ -841,8 +870,8 @@ export function VendorSignupForm() {
               }`}
             >
               {currentStep === STEPS.length
-                ? "Submit for Approval"
-                : "Save & Continue"}
+                ? "Submit for Verification"
+                : "Save & Proceed"}
             </button>
           </div>
         </div>

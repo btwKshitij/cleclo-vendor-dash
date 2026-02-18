@@ -70,16 +70,6 @@ export default function CallToAction() {
         ref={containerRef}
         className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
       >
-        {/* Badge */}
-        <motion.div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 text-sm mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Sparkles className="w-4 h-4 text-secondary" />
-          Limited Time: Zero Commission for First 3 Months
-        </motion.div>
 
         {/* Headline */}
         <motion.h2

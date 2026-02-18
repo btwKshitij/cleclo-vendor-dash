@@ -421,10 +421,11 @@ export function PickupSchedule() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl text-black font-bold tracking-tight">
-            Pickup Schedule
+            Pickup & Delivery Schedule
           </h1>
           <p className="text-primary mt-1">
-            Manage today’s pickups and delivery assignments.
+            Monitor and manage pickup assignments, delivery routing and service
+            timelines.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -536,7 +537,7 @@ export function PickupSchedule() {
                 {todayPickups}
               </p>
               <p className="text-xs text-slate-500 font-medium">
-                Pickups Today
+                Scheduled Pickups
               </p>
             </div>
           </div>
@@ -564,7 +565,7 @@ export function PickupSchedule() {
                 {deliveriesToday}
               </p>
               <p className="text-xs text-slate-500 font-medium">
-                Deliveries Today
+                Scheduled Deliveries
               </p>
             </div>
           </div>
@@ -590,7 +591,7 @@ export function PickupSchedule() {
                 {expressOrders}
               </p>
               <p className="text-xs text-slate-500 font-medium">
-                Express Orders
+                Express Priority Orders
               </p>
             </div>
           </div>
@@ -613,7 +614,9 @@ export function PickupSchedule() {
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{completed}</p>
-              <p className="text-xs text-slate-500 font-medium">Completed</p>
+              <p className="text-xs text-slate-500 font-medium">
+                Completed Today
+              </p>
             </div>
           </div>
         </div>
@@ -633,13 +636,13 @@ export function PickupSchedule() {
 
         {/* Table Header */}
         <div className="hidden md:grid md:grid-cols-14 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider rounded-t-xl">
-          <div className="col-span-2">Date</div>
-          <div className="col-span-1">Rating</div>
-          <div className="col-span-2">Delivery Person</div>
-          <div className="col-span-2">Message</div>
-          <div className="col-span-2">Speed</div>
-          <div className="col-span-1 text-center">Items</div>
-          <div className="col-span-2 text-center">Status</div>
+          <div className="col-span-2">Pickup Date</div>
+          <div className="col-span-1">Customer Rating</div>
+          <div className="col-span-2">Assigned Agent</div>
+          <div className="col-span-2">Special Instructions</div>
+          <div className="col-span-2">Service Type</div>
+          <div className="col-span-1 text-center">Item Count</div>
+          <div className="col-span-2 text-center">Pickup Status</div>
           <div className="col-span-2 text-right">Actions</div>
         </div>
 
@@ -825,8 +828,7 @@ export function PickupSchedule() {
                           router.push(`/dashboard/schedule/${schedule.id}`);
                         }}
                       >
-                        View
-                        <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                        View Details
                       </Button>
                     </div>
                   </div>
