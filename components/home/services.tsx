@@ -12,11 +12,11 @@ export default function Services() {
       icon: Shirt,
       title: "Dry Clean",
       description:
-        "Enable professional dry-cleaning workflows for delicate garments, formal wear and specialty fabrics",
+        "Enable professional dry-cleaning workflows for delicate garments, formal wear and specialty fabrics.",
       features: [
-        "Configurable stain treatment workflows",
-        "Fabric specific handling options",
-        "Premium finishing standards",
+        "Configurable stain treatment workflows.",
+        "Fabric specific handling options.",
+        "Premium finishing standards.",
       ],
       gradient: "from-violet-500 to-purple-600",
       lightGradient: "from-violet-100 to-purple-100",
@@ -29,9 +29,9 @@ export default function Services() {
       description:
         "Enable standardized washing workflows for everyday garments with configurable processes across fabric types.",
       features: [
-        "Fabric-wise and color-based wash segregation",
-        "Detergent, water level and cycle configuration",
-        "Quality checks and freshness controls",
+        "Fabric-wise and color-based wash segregation.",
+        "Detergent, water level and cycle configuration.",
+        "Quality checks and freshness controls.",
       ],
       gradient: "from-cyan-500 to-blue-500",
       lightGradient: "from-cyan-100 to-blue-100",
@@ -42,11 +42,11 @@ export default function Services() {
       icon: Wind,
       title: "Steam Iron",
       description:
-        "Provide professional pressing and finishing services with controlled turnaround times",
+        "Provide professional pressing and finishing services with controlled turnaround times.",
       features: [
-        "Consistent finishing quality",
-        "Fabric-safe temperature controls",
-        "Priority processing options",
+        "Consistent finishing quality.",
+        "Fabric-safe temperature controls.",
+        "Priority processing options.",
       ],
       gradient: "from-orange-400 to-amber-500",
       lightGradient: "from-orange-100 to-amber-100",
@@ -57,11 +57,11 @@ export default function Services() {
       icon: Sparkles,
       title: "Premium Care",
       description:
-        "Enable premium-care workflows for luxury garments, designer wear and high-value items",
+        "Enable premium-care workflows for luxury garments, designer wear and high-value items.",
       features: [
-        "Specialized handling protocols",
-        "Optional value-protection coverage",
-        "Controlled handover and packaging",
+        "Specialized handling protocols.",
+        "Optional value-protection coverage.",
+        "Controlled handover and packaging.",
       ],
       gradient: "from-rose-400 to-pink-500",
       lightGradient: "from-rose-100 to-pink-100",
@@ -232,7 +232,7 @@ export default function Services() {
             <Clock className="w-4 h-4 text-primary" />
             <span className="text-lg text-muted-foreground">
               Priority turnaround options can be configured across all service
-              categories
+              categories.
             </span>
           </div>
         </motion.div>

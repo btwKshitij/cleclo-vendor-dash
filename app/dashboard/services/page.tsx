@@ -20,8 +20,9 @@ import { Textarea } from "@/components/ui/textarea";
 const assignedServices = [
   {
     id: 1,
-    name: "Dry Clean",
-    description: "Premium dry cleaning service",
+    name: "Dry Cleaning",
+    description:
+      "Professional solvent-based care for delicate and structured garments.",
     basePrice: "₹150/piece",
     category: "Dry Clean",
     available: true,
@@ -29,7 +30,8 @@ const assignedServices = [
   {
     id: 2,
     name: "Washing",
-    description: "Regular laundry service",
+    description:
+      "Professional machine washing with fabric-appropriate detergents and controlled drying for everyday garments.",
     basePrice: "₹80/kg",
     category: "Wash",
     available: true,
@@ -37,15 +39,17 @@ const assignedServices = [
   {
     id: 3,
     name: "Steam Iron",
-    description: "Professional steam ironing",
+    description:
+      "Precision steam finishing for wrinkle-free, crisp presentation of garments.",
     basePrice: "₹20/piece",
     category: "Iron",
     available: true,
   },
   {
     id: 4,
-    name: "Darning/Repair",
-    description: "Expert fabric repair and darning",
+    name: "Repair & Alterations",
+    description:
+      "Skilled repair, stitching and fabric restoration for damaged or worn garments.",
     basePrice: "₹100/item",
     category: "Repair",
     available: true,
@@ -160,9 +164,9 @@ export default function ServicesPage() {
             Service Catalog
           </h1>
           <p className="text-slate-500 mt-1 text-lg">
-            Services and pricing are managed by Admin. You can temporarily
-            toggle availability (e.g., equipment issues). Contact Admin for
-            changes.
+            Service pricing is managed by Admin. You may toggle availability
+            based on operational capacity. Contact Admin for additions or
+            pricing updates.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -183,8 +187,9 @@ export default function ServicesPage() {
         <div>
           <p className="font-medium text-blue-800">Read-Only Service Catalog</p>
           <p className="text-sm text-blue-700 mt-1">
-            Services are assigned and priced by Admin. You can only toggle
-            availability. Contact Admin to add new services or change prices.
+            This is a read-only service catalogue. Pricing and service structure
+            are managed centrally. You may update availability based on
+            operational constraints.
           </p>
         </div>
       </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,41 +17,129 @@ import {
   Send,
   Clock,
   CheckCircle2,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const FAQ_ITEMS = [
+const FAQ_ITEMS: { question: string; answer: React.ReactNode }[] = [
   {
-    question: "How do I update my pickup availability?",
+    question: "How do I accept a new order?",
+    answer: (
+      <>
+        Go to <strong>Orders → New Orders</strong>, review the order details and
+        click <strong>Accept Order</strong>. Once <strong>accepted</strong>, the
+        order will move to the <strong>“Accepted”</strong> tab.
+      </>
+    ),
+  },
+  {
+    question: "Can I reject an order?",
     answer:
-      "Go to Settings > Availability to configure your working hours and days.",
+      "Yes. Before accepting, you may decline an order if you are unable to fulfill it. Frequent rejections may affect your vendor performance rating.",
+  },
+  {
+    question: "How do I update pickup availability?",
+    answer: (
+      <>
+        Navigate to <strong>Settings → Availability</strong> to configure your
+        working days and pickup time slots. Changes apply to future order
+        allocations.
+      </>
+    ),
+  },
+  {
+    question: "What happens if I miss a pickup window?",
+    answer:
+      "Missed pickups may impact your service performance metrics. If unavoidable, immediately update the order status and inform support to avoid escalation.",
   },
   {
     question: "When do I receive payments?",
     answer:
-      "Payments are processed weekly on Fridays for all completed orders.",
+      "Payments are processed weekly (Every Friday) for all successfully completed orders. Funds are credited to your registered payout method.",
   },
   {
-    question: "How do I handle a customer complaint?",
-    answer: "Contact support immediately and we'll help mediate the situation.",
+    question: "Where can I view my earnings?",
+    answer: (
+      <>
+        Go to the <strong>Earnings</strong> section to view completed order
+        payouts, pending settlements and payment history.
+      </>
+    ),
   },
   {
-    question: "Can I reject an order after accepting?",
+    question: "How are my earnings calculated?",
     answer:
-      "Contact support within 30 minutes of accepting to request cancellation.",
+      "Your earnings are calculated based on the service type, pricing structure and platform commission agreed upon during onboarding.",
+  },
+  {
+    question: "How are Express orders different?",
+    answer:
+      "Express orders have shorter delivery timelines and higher priority. Ensure timely processing to avoid SLA breaches.",
+  },
+  {
+    question: "Can I turn off Express orders?",
+    answer: (
+      <>
+        Yes. You can toggle service availability in the{" "}
+        <strong>Services</strong> section if you are unable to handle priority
+        loads.
+      </>
+    ),
+  },
+  {
+    question: "How do I update an order status?",
+    answer:
+      "Open the order details and update the status (Processing, Ready, Completed, etc.) as the order progresses.",
+  },
+  {
+    question: "What does “Assignment Pending” mean?",
+    answer:
+      "It means the order has not yet been assigned to a pickup or delivery agent.",
+  },
+  {
+    question: "How do I report damaged garments?",
+    answer:
+      "Immediately update the order notes and raise a support ticket with detailed information and supporting images.",
+  },
+  {
+    question: "What should I do if the app is not working properly?",
+    answer:
+      "Clear your browser cache or restart the application. If the issue persists, submit a support request with screenshots.",
+  },
+  {
+    question: "How long does support take to respond?",
+    answer:
+      "Most queries are resolved within 24 business hours. Critical operational issues are prioritized.",
+  },
+  {
+    question: "Does performance affect order allocation?",
+    answer:
+      "Yes. Timely pickups, delivery adherence and low cancellation rates positively impact order allocation priority.",
+  },
+  {
+    question: "What happens if I repeatedly delay orders?",
+    answer:
+      "Repeated SLA breaches may result in reduced order flow or temporary suspension from certain service categories.",
   },
 ];
 
 export function SupportPage() {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl text-black font-bold tracking-tight">
-          Support Center
+          Vendor Support Centre
         </h1>
         <p className="text-primary mt-1">
-          Get help with your account, orders, and more
+          Get assistance with orders, payouts, technical issues and account
+          management.
         </p>
       </div>
 
@@ -66,7 +156,9 @@ export function SupportPage() {
             <p className="text-sm font-semibold text-[#3E8940]">
               +1 (800) 123-4567
             </p>
-            <p className="text-[10px] text-slate-400">Mon-Sat, 8AM - 8PM</p>
+            <p className="text-[10px] text-slate-400">
+              Support Hours: Mon–Sat | 8:00 AM – 8:00 PM
+            </p>
           </div>
         </div>
 
@@ -81,7 +173,9 @@ export function SupportPage() {
             <p className="text-sm font-semibold text-purple-600 truncate">
               vendor@cleclo.com
             </p>
-            <p className="text-[10px] text-slate-400">Response: ~4 hours</p>
+            <p className="text-[10px] text-slate-400">
+              Average Response Time: Within 4 hours
+            </p>
           </div>
         </div>
 
@@ -90,14 +184,18 @@ export function SupportPage() {
             <MessageCircle className="h-5 w-5 text-blue-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 text-sm">Live Chat</h3>
-            <p className="text-[10px] text-slate-400 mb-1">Chat in real-time</p>
+            <h3 className="font-semibold text-slate-900 text-sm">
+              Live Chat Support
+            </h3>
+            <p className="text-[10px] text-slate-400 mb-1">
+              Connect instantly with our support team during working hours.
+            </p>
           </div>
           <Button
             size="sm"
             className="bg-blue-600 hover:bg-blue-700 h-8 text-xs shrink-0"
           >
-            Start
+            Start Chat
             <ExternalLink className="h-3 w-3 ml-1" />
           </Button>
         </div>
@@ -148,7 +246,7 @@ export function SupportPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="flex flex-col gap-5">
         {/* Contact Form */}
         <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-slate-100 flex items-center gap-3">
@@ -160,7 +258,7 @@ export function SupportPage() {
                 Submit a Support Request.
               </h2>
               <p className="text-xs text-slate-500">
-                Most issues are resolved within 24 hours.
+                Most queries are resolved within 24 hours during business days.
               </p>
             </div>
           </div>
@@ -225,17 +323,37 @@ export function SupportPage() {
             </div>
           </div>
           <div className="divide-y divide-slate-100">
-            {FAQ_ITEMS.map((faq, index) => (
-              <div
-                key={index}
-                className="px-5 py-3.5 hover:bg-slate-50/50 transition-colors"
-              >
-                <h4 className="font-medium text-slate-900 text-sm mb-1">
-                  {faq.question}
-                </h4>
-                <p className="text-sm text-slate-500">{faq.answer}</p>
-              </div>
-            ))}
+            {FAQ_ITEMS.map((faq, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div key={index} className="transition-all duration-200">
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors text-left"
+                  >
+                    <h4 className="font-semibold text-slate-900 text-sm">
+                      {faq.question}
+                    </h4>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 text-slate-400 transition-transform duration-200",
+                        isOpen && "rotate-180",
+                      )}
+                    />
+                  </button>
+                  <div
+                    className={cn(
+                      "overflow-hidden transition-all duration-200 ease-in-out",
+                      isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0",
+                    )}
+                  >
+                    <p className="px-5 pb-4 text-sm text-gray-800 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <div className="p-4 border-t border-slate-100 bg-slate-50/50">
             <Button variant="outline" className="w-full gap-2 h-10">

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const stats = [
   {
-    title: "New Assigned",
+    title: "Newly Assigned Orders",
     status: "Assigned",
     description: "+4 since yesterday",
     icon: ClipboardList,
@@ -22,7 +22,7 @@ const stats = [
     trend: "neutral",
   },
   {
-    title: "In Processing",
+    title: "Under Processing",
     status: "Processing",
     description: "15 washers active",
     icon: Settings2,

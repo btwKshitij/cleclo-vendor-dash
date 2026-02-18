@@ -20,7 +20,7 @@ export default function VerificationSystem() {
       badge: Camera,
       title: "Customer Confirmation",
       description:
-        "Order details and item condition are digitally recorded at initiation, creating a reference point for the entire service lifecycle",
+        "Order details and item condition are digitally recorded at initiation, creating a reference point for the entire service lifecycle.",
       gradient: "from-blue-500 to-cyan-500",
       lightGradient: "from-blue-50 to-cyan-50",
       dotColor: "bg-blue-500",
@@ -30,7 +30,7 @@ export default function VerificationSystem() {
       badge: Package,
       title: "Pickup Verification",
       description:
-        "Items are verified at pickup to ensure consistency with recorded order details, establishing a secure handover",
+        "Items are verified at pickup to ensure consistency with recorded order details, establishing a secure handover.",
       gradient: "from-orange-400 to-amber-500",
       lightGradient: "from-orange-50 to-amber-50",
       dotColor: "bg-orange-500",
@@ -40,7 +40,7 @@ export default function VerificationSystem() {
       badge: CheckCircle,
       title: "Vendor Intake Verification",
       description:
-        "Items are validated at the processing stage to confirm condition, service scope and handling requirements before execution",
+        "Items are validated at the processing stage to confirm condition, service scope and handling requirements before execution.",
       gradient: "from-green-500 to-emerald-500",
       lightGradient: "from-green-50 to-emerald-50",
       dotColor: "bg-green-500",

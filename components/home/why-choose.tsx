@@ -197,7 +197,7 @@ export default function WhyChoose() {
 
                     {/* Bottom accent line */}
                     <motion.div
-                      className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${reason.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
+                      className={`absolute bottom-0 left-0 right-0 mb-[-6] h-1 bg-gradient-to-r ${reason.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
                       initial={{ scaleX: 0 }}
                       animate={isHovered ? { scaleX: 1 } : { scaleX: 0 }}
                       transition={{ duration: 0.3 }}

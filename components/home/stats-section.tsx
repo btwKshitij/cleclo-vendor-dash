@@ -72,14 +72,14 @@ export default function StatsSection() {
       description: "Happy Vendors",
       gradient: "from-purple-500 to-pink-400",
     },
-    {
-      icon: MapPin,
-      value: 20,
-      suffix: "+",
-      label: "Cities Covered",
-      description: "Pan-India presence",
-      gradient: "from-orange-500 to-amber-400",
-    },
+    // {
+    //   icon: MapPin,
+    //   value: 20,
+    //   suffix: "+",
+    //   label: "Cities Covered",
+    //   description: "Pan-India presence",
+    //   gradient: "from-orange-500 to-amber-400",
+    // },
   ];
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,7 +97,7 @@ export default function StatsSection() {
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={{

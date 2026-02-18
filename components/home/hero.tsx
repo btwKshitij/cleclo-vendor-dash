@@ -251,28 +251,24 @@ export default function Hero() {
             animate="visible"
             className="space-y-8"
           >
-            {/* Badge */}
-            <motion.div variants={itemVariants}>
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm text-white/90">
-                <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                #1 Laundry Vendor Platform
-              </span>
-            </motion.div>
-
             {/* Headline */}
             <motion.h1
               variants={itemVariants}
               className="text-3xl sm:text-3xl md:text-5xl font-bold text-white leading-tight"
             >
-              Transform Your Laundry Business Into a{" "}
-              <span className="relative">
-                <span className="gradient-text">Scalable Profit Machine</span>
+              Transform Your Laundry Business Into <br /> a&nbsp;
+              <span className="relative whitespace-nowrap">
+                <span className="gradient-text">Scalable Profit</span>
                 <motion.span
-                  className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-full"
+                  className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r mb-2 from-primary via-secondary to-primary rounded-full"
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: 1, duration: 0.8 }}
                 />
+              </span>
+              <br />
+              <span className="relative whitespace-nowrap">
+                <span className="gradient-text">Machine</span>
               </span>
             </motion.h1>
 
@@ -315,7 +311,7 @@ export default function Hero() {
 
             <div className="flex items-center">
               <p className="text-sm text-white/60">
-                Powering leading laundry partners in Delhi NCR & Tier-1 cities
+                Powering leading laundry partners in Delhi NCR & Tier-1 cities.
               </p>
             </div>
 

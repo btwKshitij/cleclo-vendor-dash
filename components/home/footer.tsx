@@ -96,7 +96,7 @@ export default function Footer() {
             <div className="text-center md:text-left">
               <h3 className="text-2xl md:text-3xl font-bold mb-2">
                 Insights for Growing Laundry Businesses with{" "}
-                <span className="gradient-text">Cleclo</span>
+                <span className="gradient-text">Cleclo.</span>
               </h3>
               <p className="text-white/60">
                 Platform updates, industry insights and growth tips-delivered
@@ -265,7 +265,7 @@ export default function Footer() {
 
             {/* Made with love badge */}
             <div className="flex items-center gap-2 text-xs text-white/40">
-              <Link href="https://gohypemedia.com">Made by Go Hype Media</Link>
+              <Link href="https://gohypemedia.com">Made by Go Hype Media.</Link>
             </div>
           </motion.div>
         </div>

@@ -352,7 +352,7 @@ export default function DashboardPage() {
             Dashboard Overview
           </h1>
           <p className="text-primary mt-1">
-            Welcome back, here&apos;s what&apos;s happening today.
+            Welcome back. Here&apos;s your operational overview.
           </p>
         </div>
       </div>
