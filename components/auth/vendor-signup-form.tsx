@@ -870,8 +870,12 @@ export function VendorSignupForm() {
               }`}
             >
               {currentStep === STEPS.length
-                ? "Submit for Verification"
-                : "Save & Proceed"}
+                ? "Submit Application"
+                : currentStep === 3
+                  ? "Save & Proceed to Documents"
+                  : currentStep === 4
+                    ? "Submit for Verification"
+                    : "Save & Proceed"}
             </button>
           </div>
         </div>
