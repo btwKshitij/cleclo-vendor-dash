@@ -35,6 +35,7 @@ import {
   Star,
   Info,
   Download,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -43,6 +44,11 @@ import {
   subDays,
   isWithinInterval,
   differenceInDays,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
 } from "date-fns";
 import { DateRange } from "react-day-picker";
 import {
@@ -429,90 +435,141 @@ export function PickupSchedule() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="gap-2 text-black hover:text-black min-w-[240px] justify-start text-left font-normal bg-white"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                <span className="font-medium">Export Order Data</span>
-                {date?.from && (
-                  <>
-                    <span className="mx-2 h-4 w-px bg-slate-300" />
-                    <span className="text-slate-600 font-normal">
-                      {date.to &&
-                      differenceInDays(date.to, date.from) === 7 &&
-                      isSameDay(date.to, new Date()) ? (
-                        "Last 7 Days"
-                      ) : date.to ? (
-                        <>
-                          {format(date.from, "LLL dd")} -{" "}
-                          {format(date.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(date.from, "LLL dd, y")
-                      )}
-                    </span>
-                  </>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <div className="flex gap-2 p-3 border-b border-slate-100">
-                <div className="flex-1">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    From
-                  </span>
-                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
-                    {date?.from
-                      ? format(date.from, "MMM dd, yyyy")
-                      : "Select date"}
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    To
-                  </span>
-                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
-                    {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
-                  </div>
-                </div>
-              </div>
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate as any}
-                numberOfMonths={2}
-              />
-              <div className="p-3 border-t">
-                <Button
-                  className="w-full bg-[#3E8940] hover:bg-[#3E8940]/90"
-                  onClick={handleExport}
-                  disabled={!date?.from || isExporting}
-                >
-                  {isExporting ? "Exporting..." : "Export Data"}
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Button
+            variant="outline"
+            className="gap-2 text-black hover:text-black bg-white h-10 border-slate-200 hover:bg-slate-50"
+            onClick={handleExport}
+            disabled={!date?.from || isExporting}
+          >
+            <Download className="h-4 w-4 text-slate-500" />
+            <span className="font-medium hidden sm:inline">
+              {isExporting ? "Exporting..." : "Export Order Data"}
+            </span>
+          </Button>
         </div>
       </div>
 
       {/* Data Period Label */}
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-bold text-slate-800">
-          {date?.from &&
-          date.to &&
-          differenceInDays(date.to, date.from) === 7 &&
-          isSameDay(date.to, new Date())
-            ? "Last 7 Days Overview"
-            : date?.from
-              ? `Overview: ${format(date.from, "MMM dd")} - ${date.to ? format(date.to, "MMM dd, yyyy") : format(date.from, "MMM dd, yyyy")}`
-              : "Overview"}
-        </h3>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "justify-start text-left font-normal w-[300px] h-12 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
+              <span className="flex-1">
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
+              </span>
+              <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <div className="flex">
+              <div className="border-r border-slate-100 p-2 flex flex-col gap-1 w-[140px] bg-slate-50/50">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 mb-1">
+                  Presets
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                  onClick={() =>
+                    setDate({
+                      from: subDays(new Date(), 7),
+                      to: new Date(),
+                    })
+                  }
+                >
+                  Last 7 Days
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                  onClick={() =>
+                    setDate({
+                      from: startOfWeek(new Date()),
+                      to: endOfWeek(new Date()),
+                    })
+                  }
+                >
+                  This Week
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                  onClick={() =>
+                    setDate({
+                      from: startOfMonth(new Date()),
+                      to: endOfMonth(new Date()),
+                    })
+                  }
+                >
+                  This Month
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                  onClick={() =>
+                    setDate({
+                      from: startOfMonth(subMonths(new Date(), 1)),
+                      to: endOfMonth(subMonths(new Date(), 1)),
+                    })
+                  }
+                >
+                  Last Month
+                </Button>
+              </div>
+              <div className="p-0">
+                <div className="flex gap-2 p-3 border-b border-slate-100">
+                  <div className="flex-1">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                      From
+                    </span>
+                    <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                      {date?.from
+                        ? format(date.from, "MMM dd, yyyy")
+                        : "Select date"}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                      To
+                    </span>
+                    <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
+                      {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
+                    </div>
+                  </div>
+                </div>
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={date?.from}
+                  selected={date}
+                  onSelect={setDate as any}
+                  numberOfMonths={2}
+                />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Stats Cards */}
@@ -971,10 +1028,10 @@ export function PickupSchedule() {
               ))}
             {(!selectedOrder?.orderItems ||
               selectedOrder.orderItems.length === 0) && (
-              <p className="text-sm text-slate-500 italic text-center py-4 col-span-3">
-                No items to verify.
-              </p>
-            )}
+                <p className="text-sm text-slate-500 italic text-center py-4 col-span-3">
+                  No items to verify.
+                </p>
+              )}
           </div>
           <DialogFooter>
             <Button

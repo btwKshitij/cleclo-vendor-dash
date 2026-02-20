@@ -23,7 +23,7 @@ const stats = [
   },
   {
     title: "Under Processing",
-    status: "Processing",
+    status: "Under Processing",
     description: "15 washers active",
     icon: Settings2,
     iconBg: "bg-amber-100",

@@ -23,6 +23,14 @@ import {
   startOfDay,
   endOfDay,
   differenceInDays,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  addHours,
+  addDays,
+  subHours,
 } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/ui/calendar";
@@ -42,157 +50,123 @@ const STATIC_NOTIFICATION = {
 };
 
 // Mock data moved from recent-orders.tsx
+// Helper to generate dynamic dates
+const now = new Date();
+const getDeliveryDate = (pickup: Date, type: "Standard" | "Express 48h" | "Express 24h") => {
+  const hours = type === "Standard" ? 72 : type === "Express 48h" ? 48 : 24;
+  return addHours(pickup, hours);
+};
+
+// Mock data moved from recent-orders.tsx
 const orders = [
   {
     id: "#ORD-8291",
     customer: "Alice Freeman",
     type: "Regular",
+    serviceType: "Standard",
     avatar: "/avatars/alice.png",
     items: "5kg Wash & Fold",
-    status: "Processing",
-    dueDate: "Today, 5:00 PM",
-    isoDate: "2026-02-10T17:00:00",
+    status: "Under Processing",
+    pickupDate: subHours(now, 70), // Standard (72h), picked up 70h ago. Due in 2h. T-2 is NOW. (Borderline)
+    dueDate: format(addHours(subHours(now, 70), 72), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 70), 72).toISOString(),
   },
   {
     id: "#ORD-8292",
     customer: "Mark Wilson",
     type: "New Customer",
+    serviceType: "Express 24h",
     avatar: "/avatars/mark.png",
     items: "2 Suits Dry Clean",
     status: "Assigned",
-    dueDate: "Tomorrow, 10:00 AM",
-    isoDate: "2026-02-11T10:00:00",
+    pickupDate: subHours(now, 2), // Picked up 2h ago. Due in 22h.
+    dueDate: format(addHours(subHours(now, 2), 24), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 2), 24).toISOString(),
   },
   {
     id: "#ORD-8288",
     customer: "Sarah Jenkins",
     type: "VIP",
+    serviceType: "Standard",
     avatar: "/avatars/sarah.png",
     items: "10kg Mixed Load",
     status: "Ready",
-    dueDate: "Yesterday",
-    isoDate: "2026-02-09T12:00:00",
+    pickupDate: subDays(now, 4),
+    dueDate: format(addHours(subDays(now, 4), 72), "MMM dd, h:mm a"),
+    isoDate: addHours(subDays(now, 4), 72).toISOString(),
   },
   {
     id: "#ORD-8293",
     customer: "James Doe",
     type: "Regular",
+    serviceType: "Express 48h",
     avatar: "/avatars/james.png",
     items: "Wedding Dress Clean",
     status: "Pending Pickup",
-    dueDate: "Tomorrow, 2:00 PM",
-    isoDate: "2026-02-11T14:00:00",
+    pickupDate: addHours(now, 2), // Future pickup
+    dueDate: format(addHours(addHours(now, 2), 48), "MMM dd, h:mm a"),
+    isoDate: addHours(addHours(now, 2), 48).toISOString(),
   },
   {
     id: "#ORD-8294",
     customer: "Emily Chen",
     type: "Regular",
+    serviceType: "Standard",
     avatar: "/avatars/emily.png",
     items: "3 Curtains",
     status: "Assigned",
-    dueDate: "Tomorrow, 2:00 PM",
-    isoDate: "2026-02-11T14:00:00",
+    pickupDate: subHours(now, 5),
+    dueDate: format(addHours(subHours(now, 5), 72), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 5), 72).toISOString(),
   },
   {
     id: "#ORD-8295",
     customer: "Michael Brown",
     type: "VIP",
+    serviceType: "Express 24h",
     avatar: "/avatars/michael.png",
     items: "Premium Suit Clean",
     status: "Assigned",
-    dueDate: "Today, 4:00 PM",
-    isoDate: "2026-02-10T16:00:00",
+    pickupDate: subHours(now, 1),
+    dueDate: format(addHours(subHours(now, 1), 24), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 1), 24).toISOString(),
+
   },
   {
     id: "#ORD-8296",
     customer: "Lisa Wang",
     type: "New Customer",
+    serviceType: "Standard",
     avatar: "/avatars/lisa.png",
     items: "10kg Wash & Fold",
-    status: "Processing",
-    dueDate: "Today, 10:00 AM",
-    isoDate: "2026-02-10T10:00:00",
+    status: "Under Processing",
+    pickupDate: subHours(now, 71), // Standard (72h), picked up 71h ago. Due in 1h. Overdue (Now > Due-2h).
+    dueDate: format(addHours(subHours(now, 71), 72), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 71), 72).toISOString(),
   },
   {
     id: "#ORD-8297",
     customer: "David Miller",
     type: "Regular",
+    serviceType: "Standard",
     avatar: "/avatars/david.png",
     items: "2 Winter Coats",
-    status: "Processing",
-    dueDate: "Tomorrow, 3:00 PM",
-    isoDate: "2026-02-11T15:00:00",
+    status: "Under Processing",
+    pickupDate: subHours(now, 20),
+    dueDate: format(addHours(subHours(now, 20), 72), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 20), 72).toISOString(),
   },
   {
     id: "#ORD-8298",
     customer: "Sophie Turner",
     type: "VIP",
+    serviceType: "Express 48h",
     avatar: "/avatars/sophie.png",
     items: "Wedding Saree",
     status: "Ready",
-    dueDate: "Today, 12:00 PM",
-    isoDate: "2026-02-10T12:00:00",
-  },
-  // Additional Mock Data
-  {
-    id: "#ORD-8299",
-    customer: "Robert Taylor",
-    type: "Regular",
-    avatar: "/avatars/robert.png",
-    items: "Bedding Set x2",
-    status: "Assigned",
-    dueDate: "Feb 9, 9:00 AM",
-    isoDate: "2026-02-09T09:00:00",
-  },
-  {
-    id: "#ORD-8300",
-    customer: "Jennifer Lopez",
-    type: "VIP",
-    avatar: "/avatars/jennifer.png",
-    items: "Designer Dress",
-    status: "Pending Pickup",
-    dueDate: "today, 6:00 PM",
-    isoDate: "2026-02-10T18:00:00",
-  },
-  {
-    id: "#ORD-8301",
-    customer: "William Anderson",
-    type: "New Customer",
-    avatar: "/avatars/william.png",
-    items: "Shirts x5, Pants x3",
-    status: "Processing",
-    dueDate: "Feb 5, 5:00 PM",
-    isoDate: "2026-02-05T17:00:00",
-  },
-  {
-    id: "#ORD-8302",
-    customer: "Jessica White",
-    type: "Regular",
-    avatar: "/avatars/jessica.png",
-    items: "Comforter Cleaning",
-    status: "Ready",
-    dueDate: "Feb 4, 11:00 AM",
-    isoDate: "2026-02-04T11:00:00",
-  },
-  {
-    id: "#ORD-8303",
-    customer: "Thomas Harris",
-    type: "Regular",
-    avatar: "/avatars/thomas.png",
-    items: "Rug Cleaning",
-    status: "Pending Pickup",
-    dueDate: "Feb 8, 10:00 AM",
-    isoDate: "2026-02-08T10:00:00",
-  },
-  {
-    id: "#ORD-8304",
-    customer: "Nancy Davis",
-    type: "VIP",
-    avatar: "/avatars/nancy.png",
-    items: "Silk Blouse x2",
-    status: "Processing",
-    dueDate: "Feb 6, 2:00 PM",
-    isoDate: "2026-02-06T14:00:00",
+    pickupDate: subHours(now, 50),
+    dueDate: format(addHours(subHours(now, 50), 48), "MMM dd, h:mm a"),
+    isoDate: addHours(subHours(now, 50), 48).toISOString(),
   },
 ];
 
@@ -225,16 +199,14 @@ export default function DashboardPage() {
     }
   }, [showNotification]);
 
-  // ... existing imports
-
   const filteredOrders = date?.from
     ? orders.filter((order) => {
-        const orderDate = new Date(order.isoDate);
-        return isWithinInterval(orderDate, {
-          start: startOfDay(date.from!),
-          end: endOfDay(date.to || date.from!),
-        });
-      })
+      const orderDate = new Date(order.isoDate);
+      return isWithinInterval(orderDate, {
+        start: startOfDay(date.from!),
+        end: endOfDay(date.to || date.from!),
+      });
+    })
     : orders;
 
   const handleExport = () => {
@@ -358,92 +330,153 @@ export default function DashboardPage() {
       </div>
 
       {/* Toolbar and Data Period Label */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        {/* Data Period Label */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        {/* Date Range Picker */}
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-bold text-slate-800">
-            {date?.from &&
-            date.to &&
-            differenceInDays(date.to, date.from) === 7 &&
-            isSameDay(date.to, new Date())
-              ? "Last 7 Days Overview"
-              : date?.from
-                ? `Overview: ${format(date.from, "MMM dd")} - ${date.to ? format(date.to, "MMM dd, yyyy") : format(date.from, "MMM dd, yyyy")}`
-                : "Overview"}
-          </h3>
-        </div>
-
-        {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="gap-2 text-slate-700 bg-white border-slate-200 h-10 rounded-xl font-medium min-w-[240px] justify-start text-left"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                <span className="font-medium">Export Orders Data</span>
-                {date?.from && (
-                  <>
-                    <span className="mx-2 h-4 w-px bg-slate-300" />
-                    <span className="text-slate-600 font-normal">
-                      {date.to &&
-                      differenceInDays(date.to, date.from) === 7 &&
-                      isSameDay(date.to, new Date()) ? (
-                        "Last 7 Days"
-                      ) : date.to ? (
-                        <>
-                          {format(date.from, "LLL dd")} -{" "}
-                          {format(date.to, "LLL dd, y")}
-                        </>
-                      ) : (
-                        format(date.from, "LLL dd, y")
-                      )}
-                    </span>
-                  </>
+                className={cn(
+                  "justify-start text-left font-normal w-[300px] h-12 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900",
+                  !date && "text-muted-foreground",
                 )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date range</span>
+                )}
+                <ChevronDown className="ml-auto h-4 w-4 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <div className="flex gap-2 p-3 border-b border-slate-100">
-                <div className="flex-1">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    From
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="flex">
+                <div className="border-r border-slate-100 p-2 flex flex-col gap-1 w-[140px] bg-slate-50/50">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 mb-1">
+                    Presets
                   </span>
-                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
-                    {date?.from
-                      ? format(date.from, "MMM dd, yyyy")
-                      : "Select date"}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                    onClick={() =>
+                      setDate({
+                        from: subDays(new Date(), 7),
+                        to: new Date(),
+                      })
+                    }
+                  >
+                    Last 7 Days
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                    onClick={() =>
+                      setDate({
+                        from: startOfWeek(new Date()),
+                        to: endOfWeek(new Date()),
+                      })
+                    }
+                  >
+                    This Week
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                    onClick={() =>
+                      setDate({
+                        from: startOfMonth(new Date()),
+                        to: endOfMonth(new Date()),
+                      })
+                    }
+                  >
+                    This Month
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="justify-start text-xs font-medium text-slate-600 hover:text-[#3E8940] hover:bg-[#3E8940]/5"
+                    onClick={() =>
+                      setDate({
+                        from: startOfMonth(subMonths(new Date(), 1)),
+                        to: endOfMonth(subMonths(new Date(), 1)),
+                      })
+                    }
+                  >
+                    Last Month
+                  </Button>
+                </div>
+                <div className="p-0">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                    className="p-3"
+                  />
+                  <div className="p-3 border-t border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      {date?.from && date?.to
+                        ? `${differenceInDays(date.to, date.from) + 1} days selected`
+                        : "Select a range"}
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-xs h-8"
+                        onClick={() => setDate(undefined)}
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-[#3E8940] hover:bg-[#3E8940]/90 text-xs h-8 px-4"
+                        onClick={() => document.body.click()}
+                      >
+                        Apply
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                    To
-                  </span>
-                  <div className="text-xs font-semibold text-slate-800 border border-slate-200 rounded-md px-2 py-1.5 mt-1 bg-slate-50">
-                    {date?.to ? format(date.to, "MMM dd, yyyy") : "-"}
-                  </div>
-                </div>
-              </div>
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={setDate}
-                numberOfMonths={2}
-              />
-              <div className="p-3 border-t">
-                <Button
-                  className="w-full bg-[#3E8940] hover:bg-[#3E8940]/90"
-                  onClick={handleExport}
-                  disabled={!date?.from || isExporting}
-                >
-                  {isExporting ? "Exporting..." : "Export Data"}
-                </Button>
               </div>
             </PopoverContent>
           </Popover>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="outline"
+            className="gap-2 text-slate-700 bg-white border-slate-200 h-12 rounded-xl font-bold px-6 hover:bg-slate-50"
+            onClick={handleExport}
+            disabled={!date?.from || isExporting}
+          >
+            {isExporting ? (
+              <span className="flex items-center gap-2">
+                <div className="h-4 w-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
+                Exporting...
+              </span>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Export Data
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

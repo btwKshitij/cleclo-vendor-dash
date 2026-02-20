@@ -1,4 +1,4 @@
-import { isBefore, subHours } from "date-fns";
+import { isBefore, subHours, format } from "date-fns";
 import Link from "next/link";
 import {
   Table,
@@ -10,12 +10,17 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, AlertTriangle } from "lucide-react";
+import { MoreVertical, AlertTriangle, Info } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "Processing":
+    case "Under Processing":
       return "bg-yellow-100 text-yellow-600 hover:bg-yellow-200 border-none px-3 font-semibold";
     case "Assigned":
       return "bg-blue-100 text-blue-600 hover:bg-blue-200 border-none px-3 font-semibold";
@@ -77,7 +82,17 @@ export function RecentOrders({
                 Due Date
               </TableHead>
               <TableHead className="text-xs font-bold uppercase text-[#4FA851] py-3">
-                Notification
+                <div className="flex items-center gap-1">
+                  Notification
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="h-3 w-3 text-slate-400" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Orders must be marked 'Ready' 2 hours before scheduled delivery.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </TableHead>
               <TableHead className="text-right text-xs font-bold uppercase text-[#4FA851] py-3 pr-4">
                 Actions
@@ -86,92 +101,121 @@ export function RecentOrders({
           </TableHeader>
           <TableBody>
             {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <TableRow
-                  key={order.id}
-                  className="hover:bg-slate-50 border-b cursor-pointer transition-colors"
-                  onClick={() => onOrderClick?.(order.id)}
-                >
-                  <TableCell className="font-semibold text-black py-3 pl-4">
-                    <div className="flex items-center gap-2">
-                      {order.isoDate &&
-                        isBefore(
-                          new Date(order.isoDate),
-                          subHours(new Date(), 24),
-                        ) && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                      <span>{order.id}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={order.avatar} alt={order.customer} />
-                        <AvatarFallback>
-                          {order.customer
-                            .split(" ")
-                            .map((n: string) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-black">
-                          {order.customer}
-                        </span>
-                        <span className="text-xs text-[#3E8940] font-medium">
-                          {order.type}
-                        </span>
+              filteredOrders.map((order) => {
+                const deliveryDate = order.isoDate
+                  ? new Date(order.isoDate)
+                  : null;
+                const readyDeadline = deliveryDate
+                  ? subHours(deliveryDate, 2)
+                  : null;
+                const isOverdue = readyDeadline
+                  ? isBefore(readyDeadline, new Date())
+                  : false;
+
+                return (
+                  <TableRow
+                    key={order.id}
+                    className="hover:bg-slate-50 border-b cursor-pointer transition-colors"
+                    onClick={() => onOrderClick?.(order.id)}
+                  >
+                    <TableCell className="font-semibold text-black py-3 pl-4">
+                      <div className="flex items-center gap-2">
+                        {isOverdue && order.status !== "Ready" && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <AlertTriangle className="h-4 w-4 text-red-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>This order is overdue for readiness.</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        <span>{order.id}</span>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium py-3">
-                    {order.items}
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <Badge
-                      variant="outline"
-                      className={getStatusColor(order.status)}
-                    >
-                      <span className="mr-2 h-1.5 w-1.5 rounded-full bg-current" />
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium py-3">
-                    <span>{order.dueDate}</span>
-                  </TableCell>
-                  <TableCell className="py-3">
-                    {order.isoDate &&
-                    isBefore(
-                      new Date(order.isoDate),
-                      subHours(new Date(), 24),
-                    ) ? (
-                      <span className="text-red-500 font-bold">Overdue</span>
-                    ) : null}
-                  </TableCell>
-                  <TableCell className="text-right py-3 pr-4">
-                    {order.status === "Assigned" ? (
-                      <Button
-                        size="sm"
-                        className="bg-[#3E8940] hover:bg-[#3E8940]/90 h-8 px-4 font-bold"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOrderClick?.(order.id);
-                        }}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage
+                            src={order.avatar}
+                            alt={order.customer}
+                          />
+                          <AvatarFallback>
+                            {order.customer
+                              .split(" ")
+                              .map((n: string) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-black">
+                            {order.customer}
+                          </span>
+                          <span className="text-xs text-[#3E8940] font-medium">
+                            {order.type}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium py-3">
+                      {order.items}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <Badge
+                        variant="outline"
+                        className={getStatusColor(order.status)}
                       >
-                        Accept
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-[#3E8940] hover:text-[#3E8940] hover:bg-[#3E8940]/10"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
+                        <span className="mr-2 h-1.5 w-1.5 rounded-full bg-current" />
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-medium py-3">
+                      <span>{order.dueDate}</span>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      {order.isoDate && readyDeadline ? (
+                        <div className="flex flex-col">
+                          {isOverdue && order.status !== "Ready" ? (
+                            <span className="text-red-600 font-bold text-xs flex items-center gap-1">
+                              Overdue
+                            </span>
+                          ) : null}
+                          <span
+                            className={`text-xs ${isOverdue && order.status !== "Ready" ? "text-red-500 font-medium" : "text-slate-500"}`}
+                          >
+                            Ready by: {format(readyDeadline, "MMM dd, h:mm a")}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 text-xs">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right py-3 pr-4">
+                      {order.status === "Assigned" ? (
+                        <Button
+                          size="sm"
+                          className="bg-[#3E8940] hover:bg-[#3E8940]/90 h-8 px-4 font-bold"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOrderClick?.(order.id);
+                          }}
+                        >
+                          Accept
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-[#3E8940] hover:text-[#3E8940] hover:bg-[#3E8940]/10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-5 w-5" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell
