@@ -387,7 +387,7 @@ export function VendorSignupForm() {
                       "Dry Cleaning",
                       "Washing",
                       "Steam Iron",
-                      "Darning/Repair",
+                      "Repair & Alterations",
                     ].map((service) => (
                       <label
                         key={service}
@@ -652,7 +652,7 @@ export function VendorSignupForm() {
                       </label>
                       <input
                         type="text"
-                        placeholder="Your bank name"
+                        placeholder="Your Bank Name"
                         className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                       />
                     </div>
@@ -675,7 +675,7 @@ export function VendorSignupForm() {
                       </label>
                       <input
                         type="text"
-                        placeholder="Re-enter Bank Account Number"
+                        placeholder="Re-Enter Bank Account Number"
                         className="w-full px-5 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 font-medium transition-all duration-200 focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:shadow-lg focus:shadow-emerald-500/10"
                       />
                     </div>
