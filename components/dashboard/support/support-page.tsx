@@ -263,7 +263,7 @@ export function SupportPage() {
             </div>
           </div>
           <div className="p-5 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label htmlFor="subject" className="text-sm font-medium">
                   Subject

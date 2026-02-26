@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/dashboard/sidebar-provider";
-import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -15,15 +13,8 @@ import {
   Package,
   Headphones,
   Settings,
-  LogOut,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Menu,
+  X,
 } from "lucide-react";
-
-// ... (items arrays remain same, not repeating them to save tokens if possible, but replace_file_content needs full block usually if I target the whole file.
-// However, I can just replace the component function and imports if I target carefully.
-// Let's replace the whole file content for safety/cleanliness as the structure changes significantly.)
 
 const sidebarItems = [
   {
@@ -66,7 +57,7 @@ const bottomItems = [
   },
 ];
 
-export function DashboardSidebar() {
+function SidebarContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname();
   const { isCollapsed } = useSidebar();
 
@@ -114,6 +105,7 @@ export function DashboardSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onLinkClick}
                 className={cn(
                   "flex items-center rounded-lg py-2 transition-all hover:text-primary group relative",
                   isCollapsed ? "justify-center px-2" : "gap-3 px-3",
@@ -145,6 +137,7 @@ export function DashboardSidebar() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onLinkClick}
             className={cn(
               "flex items-center rounded-lg py-2 transition-all hover:text-primary group relative",
               isCollapsed ? "justify-center px-2" : "gap-3 px-3",
@@ -170,5 +163,42 @@ export function DashboardSidebar() {
         ))}
       </div>
     </div>
+  );
+}
+
+// Desktop sidebar (unchanged behavior)
+export function DashboardSidebar() {
+  return <SidebarContent />;
+}
+
+// Mobile sidebar — slide-out overlay drawer
+export function MobileSidebar() {
+  const { isMobileOpen, closeMobileSidebar } = useSidebar();
+
+  if (!isMobileOpen) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-40 bg-black/50 md:hidden"
+        onClick={closeMobileSidebar}
+      />
+
+      {/* Drawer */}
+      <div className="fixed inset-y-0 left-0 z-50 md:hidden flex">
+        <div className="relative flex flex-col w-64 bg-card h-full shadow-xl">
+          {/* Close button */}
+          <button
+            onClick={closeMobileSidebar}
+            className="absolute top-3 right-3 p-1.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <SidebarContent onLinkClick={closeMobileSidebar} />
+        </div>
+      </div>
+    </>
   );
 }

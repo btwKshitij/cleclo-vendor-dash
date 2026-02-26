@@ -199,21 +199,18 @@ export default function ServicesPage() {
         {services.map((service) => (
           <div
             key={service.id}
-            className={`bg-white rounded-xl shadow-sm border p-5 transition-all ${
-              !service.available ? "opacity-60" : ""
-            }`}
+            className={`bg-white rounded-xl shadow-sm border p-5 transition-all ${!service.available ? "opacity-60" : ""
+              }`}
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div
-                  className={`p-2 rounded-lg ${
-                    service.available ? "bg-primary/10" : "bg-slate-100"
-                  }`}
+                  className={`p-2 rounded-lg ${service.available ? "bg-primary/10" : "bg-slate-100"
+                    }`}
                 >
                   <Package
-                    className={`h-5 w-5 ${
-                      service.available ? "text-primary" : "text-slate-400"
-                    }`}
+                    className={`h-5 w-5 ${service.available ? "text-primary" : "text-slate-400"
+                      }`}
                   />
                 </div>
                 <Badge
@@ -237,11 +234,10 @@ export default function ServicesPage() {
 
             <div className="flex items-center justify-end pt-3 border-t">
               <Badge
-                className={`${
-                  service.available
+                className={`${service.available
                     ? "bg-green-100 text-green-700"
                     : "bg-red-100 text-red-700"
-                } border-none`}
+                  } border-none`}
               >
                 {service.available ? (
                   <>
@@ -261,7 +257,7 @@ export default function ServicesPage() {
       </div>
 
       {/* Contact Admin */}
-      <div className="bg-slate-50 rounded-xl border p-4 flex items-center justify-between">
+      <div className="bg-slate-50 rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="font-medium text-black">
             Need to add or modify services?

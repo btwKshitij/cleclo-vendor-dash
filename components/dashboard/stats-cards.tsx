@@ -61,7 +61,7 @@ export function StatsCards({
   }));
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
       {cardData.map((stat) => (
         <Card
           key={stat.title}

@@ -9,6 +9,7 @@ import {
   Clock,
   X,
   ChevronRight,
+  Menu,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -51,14 +52,30 @@ const NOTIFICATIONS = [
 ];
 
 export function DashboardHeader() {
-  const { isCollapsed, toggleSidebar } = useSidebar();
+  const { isCollapsed, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length;
 
   return (
-    <header className="flex h-16 w-full justify-between items-center border-b bg-background px-6">
+    <header className="flex h-16 w-full justify-between items-center border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+        {/* Mobile: hamburger to open mobile drawer */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggleMobileSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
+        {/* Desktop: collapse/expand toggle (unchanged) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hidden md:flex"
+          onClick={toggleSidebar}
+        >
           {isCollapsed ? (
             <PanelLeftOpen className="h-5 w-5" />
           ) : (
@@ -66,7 +83,8 @@ export function DashboardHeader() {
           )}
         </Button>
       </div>
-      <div className="flex items-center gap-4 ml-5">
+
+      <div className="flex items-center gap-3 md:gap-4 ml-auto">
         {/* Notification Bell with Dropdown */}
         <div className="relative">
           <Button
@@ -92,8 +110,8 @@ export function DashboardHeader() {
                 onClick={() => setShowNotifications(false)}
               />
 
-              {/* Dropdown Panel */}
-              <div className="absolute right-0 top-12 z-50 w-[380px] bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
+              {/* Dropdown Panel — responsive width */}
+              <div className="absolute right-0 top-12 z-50 w-[calc(100vw-2rem)] max-w-[380px] bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-slate-100">
                   <div className="flex items-center gap-2">
@@ -127,11 +145,11 @@ export function DashboardHeader() {
                           className={cn(
                             "h-10 w-10 rounded-full flex items-center justify-center shrink-0",
                             notif.type === "new_order" &&
-                              "bg-orange-100 text-orange-600",
+                            "bg-orange-100 text-orange-600",
                             notif.type === "processing" &&
-                              "bg-blue-100 text-blue-600",
+                            "bg-blue-100 text-blue-600",
                             notif.type === "completed" &&
-                              "bg-green-100 text-green-600"
+                            "bg-green-100 text-green-600"
                           )}
                         >
                           {notif.type === "new_order" && (
@@ -189,7 +207,7 @@ export function DashboardHeader() {
           )}
         </div>
 
-        <div className="flex items-center gap-3 border-l pl-4">
+        <div className="flex items-center gap-3 border-l pl-3 md:pl-4">
           <div className="text-right hidden sm:block">
             <p className="text-sm text-black font-bold leading-none">
               Clean Press Laundry

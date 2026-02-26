@@ -412,7 +412,7 @@ export default function OrdersPage() {
 
   return (
     <div className="flex-1 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Orders Dashboard
@@ -424,7 +424,7 @@ export default function OrdersPage() {
         </div>
         <button
           onClick={() => setLiveUpdates(!liveUpdates)}
-          className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+          className="flex items-center w-fit gap-2 bg-white px-3 py-1.5 rounded-full border shadow-sm hover:shadow-md transition-shadow cursor-pointer"
         >
           <div
             className={cn(
@@ -494,8 +494,8 @@ export default function OrdersPage() {
               <CalendarIcon className="w-4 h-4 mr-2" />
               {date?.from ? (
                 date.to &&
-                differenceInDays(date.to, date.from) === 7 &&
-                isSameDay(date.to, new Date()) ? (
+                  differenceInDays(date.to, date.from) === 7 &&
+                  isSameDay(date.to, new Date()) ? (
                   "Last 7 Days"
                 ) : date.to ? (
                   <>
@@ -612,7 +612,7 @@ export default function OrdersPage() {
                       {order.serviceSpeed === "economy"
                         ? "Standard"
                         : order.serviceSpeed.charAt(0).toUpperCase() +
-                          order.serviceSpeed.slice(1)}
+                        order.serviceSpeed.slice(1)}
                     </p>
                   </div>
 

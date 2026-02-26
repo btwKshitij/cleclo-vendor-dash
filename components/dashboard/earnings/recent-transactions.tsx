@@ -136,62 +136,64 @@ export function RecentTransactions({
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-            <TableHead className="font-semibold text-slate-600">
-              Transaction ID
-            </TableHead>
-            <TableHead className="font-semibold text-slate-600">
-              Customer / Type
-            </TableHead>
-            <TableHead className="font-semibold text-slate-600">
-              Service
-            </TableHead>
-            <TableHead className="font-semibold text-slate-600">Date</TableHead>
-            <TableHead className="font-semibold text-slate-600">
-              Status
-            </TableHead>
-            <TableHead className="text-right font-semibold text-slate-600">
-              Amount
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.map((txn) => (
-            <TableRow key={txn.id} className="hover:bg-slate-50">
-              <TableCell className="font-medium text-slate-900">
-                {txn.id}
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col">
-                  <span className="font-medium text-slate-900">
-                    {txn.customer}
-                  </span>
-                  <span className="text-xs text-slate-500">{txn.type}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-slate-600">{txn.service}</TableCell>
-              <TableCell className="text-slate-600">{txn.date}</TableCell>
-              <TableCell>
-                <Badge
-                  variant="secondary"
-                  className={
-                    txn.status === "Completed" || txn.status === "Processed"
-                      ? "bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
-                      : "bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200"
-                  }
-                >
-                  {txn.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right font-bold text-slate-900">
-                {txn.amount}
-              </TableCell>
+      <div className="overflow-x-auto sm:overflow-visible rounded-lg border sm:border-0 border-slate-100 p-0 sm:p-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+              <TableHead className="font-semibold text-slate-600">
+                Transaction ID
+              </TableHead>
+              <TableHead className="font-semibold text-slate-600">
+                Customer / Type
+              </TableHead>
+              <TableHead className="font-semibold text-slate-600">
+                Service
+              </TableHead>
+              <TableHead className="font-semibold text-slate-600">Date</TableHead>
+              <TableHead className="font-semibold text-slate-600">
+                Status
+              </TableHead>
+              <TableHead className="text-right font-semibold text-slate-600">
+                Amount
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {transactions.map((txn) => (
+              <TableRow key={txn.id} className="hover:bg-slate-50">
+                <TableCell className="font-medium text-slate-900">
+                  {txn.id}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col whitespace-nowrap">
+                    <span className="font-medium text-slate-900">
+                      {txn.customer}
+                    </span>
+                    <span className="text-xs text-slate-500">{txn.type}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-slate-600 whitespace-nowrap">{txn.service}</TableCell>
+                <TableCell className="text-slate-600 whitespace-nowrap">{txn.date}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant="secondary"
+                    className={
+                      txn.status === "Completed" || txn.status === "Processed"
+                        ? "bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
+                        : "bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200"
+                    }
+                  >
+                    {txn.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right font-bold text-slate-900">
+                  {txn.amount}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

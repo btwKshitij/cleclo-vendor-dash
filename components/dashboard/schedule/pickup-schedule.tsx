@@ -437,12 +437,12 @@ export function PickupSchedule() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            className="gap-2 text-black hover:text-black bg-white h-10 border-slate-200 hover:bg-slate-50"
+            className="gap-2 text-black w-fit hover:text-black bg-white h-10 border-slate-200 hover:bg-slate-50"
             onClick={handleExport}
             disabled={!date?.from || isExporting}
           >
             <Download className="h-4 w-4 text-slate-500" />
-            <span className="font-medium hidden sm:inline">
+            <span className="font-medium inline">
               {isExporting ? "Exporting..." : "Export Order Data"}
             </span>
           </Button>
@@ -456,7 +456,7 @@ export function PickupSchedule() {
             <Button
               variant="outline"
               className={cn(
-                "justify-start text-left font-normal w-[300px] h-12 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900",
+                "justify-start text-left font-normal w-full sm:w-[300px] h-10 md:h-12 bg-white border-slate-200 hover:bg-slate-50 hover:text-slate-900",
                 !date && "text-muted-foreground"
               )}
             >
@@ -942,22 +942,45 @@ export function PickupSchedule() {
                       <div className="text-xs text-slate-400 mt-0.5 font-medium">
                         {schedule.orderId}
                       </div>
-                      <p className="text-sm text-slate-500 mt-0.5">
-                        {schedule.status !== "completed"
-                          ? "*****"
-                          : schedule.address}
-                        , {schedule.city}
-                      </p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <Package className="h-3.5 w-3.5" />
-                          {schedule.items} items
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Phone className="h-3.5 w-3.5" />
-                          {schedule.phone}
-                        </span>
+                      {/* Item Count */}
+                      <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
+                        <Package className="h-3.5 w-3.5" />
+                        <span>{schedule.items} items</span>
                       </div>
+                      {/* Assigned Agent */}
+                      <div className="flex items-center gap-1.5 mt-1.5 text-xs">
+                        <span className="text-slate-400 font-medium">Agent:</span>
+                        {schedule.driver ? (
+                          <span className="font-semibold text-slate-700">{schedule.driver}</span>
+                        ) : (
+                          <span className="font-semibold text-red-500 italic">Not Assigned</span>
+                        )}
+                      </div>
+                      {/* Service Type */}
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <span className="text-xs text-slate-400 font-medium">Service:</span>
+                        <Badge
+                          className={cn(
+                            "border px-2 py-0 text-[10px] font-semibold",
+                            getDeliveryBadgeColor(schedule.deliveryType),
+                          )}
+                        >
+                          {schedule.deliveryType === "Express 24h" ? (
+                            <>Express 24H <span className="ml-1">⚡⚡</span></>
+                          ) : schedule.deliveryType === "Express 48h" ? (
+                            <>Express 48H <span className="ml-1">⚡</span></>
+                          ) : (
+                            "Standard"
+                          )}
+                        </Badge>
+                      </div>
+                      {/* Special Instructions */}
+                      {schedule.note && (
+                        <div className="flex items-start gap-1.5 mt-1.5 text-xs">
+                          <span className="text-slate-400 font-medium shrink-0">Note:</span>
+                          <span className="text-slate-600 italic">{schedule.note}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex gap-2 pt-2">

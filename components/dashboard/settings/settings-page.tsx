@@ -119,11 +119,10 @@ export function SettingsPage() {
               ))}
             </div>
             <div className="p-2 border-t border-slate-100">
-              <button className="w-full flex items-center gap-3 p-3 rounded-lg text-left text-red-600 hover:bg-red-50 transition-all">
+              <Link href="/" className="w-full flex items-center gap-3 p-3 rounded-lg text-left text-red-600 hover:bg-red-50 transition-all">
                 <LogOut className="h-5 w-5" />
-                
-                <Link href="/" className="font-medium text-sm">Log Out</Link>
-              </button>
+                <span className="font-medium text-sm">Log Out</span>
+              </Link>
             </div>
           </div>
         </div>
