@@ -128,7 +128,7 @@ export default function HowItWorks() {
               style={{ opacity: badgeOpacity, scale: badgeScale }}
               className="bg-background/80 backdrop-blur-md border border-primary/20 shadow-2xl shadow-primary/10 px-6 py-3 rounded-2xl flex items-center gap-4 whitespace-nowrap"
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="text-sm">
@@ -170,21 +170,26 @@ export default function HowItWorks() {
                       className="bg-background rounded-2xl p-8 border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 group"
                       whileHover={{ y: -5 }}
                     >
-                      {/* Step number - Mobile */}
-                      <div
-                        className={`md:hidden inline-flex items-center gap-2 mb-4 ${step.color}`}
-                      >
-                        <span className="text-xs font-bold uppercase tracking-wider">
-                          Step
-                        </span>
-                        <span className="text-2xl font-bold">
-                          {step.number}
-                        </span>
+                      {/* Mobile Header: Step Number & Icon */}
+                      <div className="md:hidden flex items-center justify-between mb-6">
+                        <div className={`flex items-center gap-2 ${step.color}`}>
+                          <span className="text-xs font-bold uppercase tracking-wider">
+                            Step
+                          </span>
+                          <span className="text-3xl font-bold leading-none">
+                            {step.number}
+                          </span>
+                        </div>
+                        <div
+                          className={`flex items-center justify-center w-14 h-14 rounded-xl bg-linear-to-br ${step.gradient} shadow-lg group-hover:scale-110 transition-transform`}
+                        >
+                          <IconComponent className="w-7 h-7 text-white" />
+                        </div>
                       </div>
 
-                      {/* Icon */}
+                      {/* Desktop Icon (hidden on mobile) */}
                       <div
-                        className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${step.gradient} mb-4 shadow-lg group-hover:scale-110 transition-transform`}
+                        className={`hidden md:inline-flex items-center justify-center w-14 h-14 rounded-xl bg-linear-to-br ${step.gradient} mb-4 shadow-lg group-hover:scale-110 transition-transform`}
                       >
                         <IconComponent className="w-7 h-7 text-white" />
                       </div>
